@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Bahia 2026 — Brasileirão Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --azul: #0A2D6E;
+  --azul-mid: #1449B0;
+  --azul-light: #1E5FD4;
+  --vermelho: #C8102E;
+  --vermelho-dark: #9B0D23;
+  --branco: #FFFFFF;
+  --cinza-bg: #F0F2F7;
+  --cinza-card: #FFFFFF;
+  --cinza-border: rgba(10,45,110,0.12);
+  --cinza-text: #4A5568;
+  --cinza-muted: #8A96A8;
+  --sombra: 0 2px 12px rgba(10,45,110,0.10);
+  --sombra-forte: 0 4px 20px rgba(10,45,110,0.18);
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--cinza-bg);
+  color: var(--azul);
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ─── HEADER ─── */
+.app-header {
+  background: var(--azul);
+  padding: 48px 20px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.app-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(200,16,46,0.18);
+}
+.app-header::after {
+  content: '';
+  position: absolute;
+  bottom: -20px; left: 30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-circle {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--branco);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 3px rgba(200,16,46,0.5);
+  flex-shrink: 0;
+}
+.logo-name h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--branco);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.logo-name p {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+.wiki-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 6px 11px;
+  color: rgba(255,255,255,0.85);
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wiki-btn:hover { background: rgba(255,255,255,0.18); }
+
+/* Stat strip no header */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+.stat-item {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 8px 6px;
+  text-align: center;
+}
+.stat-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--branco);
+  line-height: 1;
+}
+.stat-val.red { color: #FF6B6B; }
+.stat-val.green { color: #6BDFA3; }
+.stat-lbl {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-top: 2px;
+}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  background: var(--branco);
+  border-top: 1px solid var(--cinza-border);
+  display: flex;
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgba(10,45,110,0.10);
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  gap: 4px;
+  position: relative;
+}
+.nav-btn.on::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 3px;
+  background: var(--vermelho);
+  border-radius: 0 0 3px 3px;
+}
+.nav-icon {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--cinza-muted);
+}
+.nav-btn.on .nav-label { color: var(--azul); }
+.nav-btn.on .nav-icon svg path,
+.nav-btn.on .nav-icon svg rect,
+.nav-btn.on .nav-icon svg circle { fill: var(--azul); }
+
+/* ─── CONTENT ─── */
+.content {
+  padding: 16px;
+  padding-bottom: 80px;
+}
+.tab-panel { display: none; }
+.tab-panel.on { display: block; }
+
+/* ─── SECTION TITLE ─── */
+.sec-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--azul);
+  margin: 20px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sec-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--cinza-border);
+}
+.sec-title:first-child { margin-top: 4px; }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--cinza-card);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+  border: 1px solid var(--cinza-border);
+  overflow: hidden;
+}
+.card + .card { margin-top: 10px; }
+
+/* ─── METAS ─── */
+.meta-list { padding: 4px 0; }
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--cinza-border);
+}
+.meta-row:last-child { border-bottom: none; }
+.meta-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.meta-info { flex: 1; min-width: 0; }
+.meta-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--azul);
+}
+.meta-sub {
+  font-size: 11px;
+  color: var(--cinza-text);
+  margin-top: 1px;
+}
+.meta-bar-wrap {
+  width: 70px;
+  height: 4px;
+  background: var(--cinza-bg);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.meta-bar { height: 100%; border-radius: 999px; transition: width .5s; }
+.meta-pts {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: right;
+  min-width: 52px;
+}
+.meta-tag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+.tag-ok { background: #DCFCE7; color: #166534; }
+.tag-pend { background: #EFF6FF; color: #1E40AF; }
+
+/* ─── BLOCOS ─── */
+.bloco-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.bloco-card {
+  background: var(--cinza-card);
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--cinza-border);
+  padding: 12px;
+  box-shadow: var(--sombra);
+}
+.bloco-card.ok { border-color: #16A34A; background: #F0FDF4; }
+.bloco-card.fail { border-color: #DC2626; background: #FEF2F2; }
+.bloco-card.partial { border-color: #D97706; background: #FFFBEB; }
+.bloco-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+.bloco-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--azul);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.bloco-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+.bb-ok { background: #DCFCE7; color: #166534; }
+.bb-fail { background: #FEE2E2; color: #991B1B; }
+.bb-pend { background: #F1F5F9; color: #475569; }
+.bb-partial { background: #FEF3C7; color: #92400E; }
+.bloco-pts-row {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.bloco-real {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+.bloco-real.green { color: #16A34A; }
+.bloco-real.red { color: #DC2626; }
+.bloco-real.amber { color: #D97706; }
+.bloco-real.muted { color: var(--cinza-muted); }
+.bloco-sep { font-size: 13px; color: var(--cinza-muted); }
+.bloco-meta { font-size: 15px; color: var(--cinza-text); }
+.bloco-sub { font-size: 10px; color: var(--cinza-muted); margin-top: 3px; }
+.bloco-accum { font-size: 10px; color: var(--cinza-text); margin-top: 5px; font-weight: 600; }
+
+/* ─── JOGOS ─── */
+.turn-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--branco);
+  background: var(--azul-mid);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  margin: 14px 0 6px;
+  display: inline-block;
+}
+.game-card {
+  background: var(--cinza-card);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--cinza-border);
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto;
+  gap: 0;
+  align-items: stretch;
+  margin-bottom: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(10,45,110,0.06);
+}
+.game-card.played-w { border-left: 3px solid #16A34A; }
+.game-card.played-e { border-left: 3px solid #2563EB; }
+.game-card.played-l { border-left: 3px solid #DC2626; }
+.game-card.next-game { border-left: 3px solid var(--vermelho); background: #FFF8F8; }
+.game-rnd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--cinza-muted);
+  background: var(--cinza-bg);
+  border-right: 1px solid var(--cinza-border);
+  min-width: 28px;
+}
+.game-info {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.game-opp {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--azul);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.game-meta {
+  font-size: 10px;
+  color: var(--cinza-muted);
+  margin-top: 1px;
+}
+.loc-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-right: 3px;
+}
+.loc-c { background: var(--azul); color: white; }
+.loc-f { background: var(--cinza-bg); color: var(--cinza-text); border: 1px solid var(--cinza-border); }
+.game-pts-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  border-left: 1px solid var(--cinza-border);
+}
+.gpts-w { color: #16A34A; }
+.gpts-e { color: #2563EB; }
+.gpts-l { color: #DC2626; }
+.gpts-p { color: var(--cinza-bg); }
+.game-sel-col {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  border-left: 1px solid var(--cinza-border);
+}
+.res-sel {
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--cinza-border);
+  border-radius: 6px;
+  padding: 4px 5px;
+  background: var(--cinza-bg);
+  color: var(--azul);
+  cursor: pointer;
+  width: 72px;
+  appearance: none;
+  text-align: center;
+}
+
+/* ─── PASTE PANEL ─── */
+.paste-panel {
+  background: var(--cinza-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--cinza-border);
+  padding: 14px;
+  box-shadow: var(--sombra);
+}
+.paste-hint {
+  font-size: 12px;
+  color: var(--cinza-text);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.paste-hint code {
+  font-family: monospace;
+  background: var(--cinza-bg);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--azul);
+}
+.paste-panel textarea {
+  width: 100%;
+  background: var(--cinza-bg);
+  border: 1px solid var(--cinza-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--azul);
+  resize: vertical;
+  min-height: 60px;
+  font-family: monospace;
+}
+.paste-panel textarea:focus { outline: none; border-color: var(--azul-mid); }
+.paste-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+}
+.btn-primary {
+  background: var(--azul);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.btn-primary:active { background: var(--azul-mid); transform: scale(0.98); }
+.paste-status { font-size: 11px; color: #16A34A; font-weight: 500; }
+
+/* ─── GRÁFICO ─── */
+.chart-card {
+  background: var(--cinza-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--cinza-border);
+  padding: 14px;
+  box-shadow: var(--sombra);
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-bottom: 12px;
+}
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--cinza-text);
+}
+.leg-line {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+/* ─── PROJEÇÃO CARD ─── */
+.proj-hero {
+  background: var(--azul);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.proj-hero::before {
+  content: '';
+  position: absolute;
+  right: -20px; top: -20px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(200,16,46,0.2);
+}
+.proj-left { position: relative; z-index: 1; }
+.proj-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 2px;
+}
+.proj-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 52px;
+  font-weight: 800;
+  color: var(--branco);
+  line-height: 1;
+}
+.proj-sub { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.proj-right {
+  position: relative;
+  z-index: 1;
+  text-align: right;
+}
+.proj-aprov-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #6BDFA3;
+  line-height: 1;
+}
+.proj-aprov-lbl { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+
+/* ─── FADE IN ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tab-panel.on { animation: fadeUp 0.2s ease; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-top">
+    <div class="logo-area">
+      <div class="logo-circle">
+        <svg width="34" height="34" viewBox="0 0 34 34">
+          <circle cx="17" cy="17" r="16" fill="#0A2D6E"/>
+          <polygon points="17,3 28,28 6,28" fill="#FFFFFF" opacity="0.12"/>
+          <polygon points="17,6 26,27 8,27" fill="#FFFFFF"/>
+          <polygon points="17,13 24,27 10,27" fill="#C8102E"/>
+        </svg>
+      </div>
+      <div class="logo-name">
+        <h1>BAHIA 2026</h1>
+        <p>BRASILEIRÃO TRACKER</p>
+      </div>
+    </div>
+    <a class="wiki-btn" href="https://en.wikipedia.org/wiki/2026_Campeonato_Brasileiro_S%C3%A9rie_A" target="_blank">
+      <svg width="12" height="12" viewBox="0 0 12 12" style="width:12px;height:12px"><circle cx="6" cy="6" r="5.5" fill="none" stroke="currentColor" stroke-width="1.2"/><text x="6" y="9.5" text-anchor="middle" font-size="7" fill="currentColor" font-weight="700">W</text></svg>
+      Wikipedia
+    </a>
+  </div>
+  <div class="stat-strip" id="statStrip">
+    <div class="stat-item"><div class="stat-val" id="sh-pos">3°</div><div class="stat-lbl">Posição</div></div>
+    <div class="stat-item"><div class="stat-val" id="sh-pts">17</div><div class="stat-lbl">Pontos</div></div>
+    <div class="stat-item"><div class="stat-val green" id="sh-aprov">62,9%</div><div class="stat-lbl">Aproveit.</div></div>
+    <div class="stat-item"><div class="stat-val" id="sh-proj">—</div><div class="stat-lbl">Proj. final</div></div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- PAINEL -->
+  <div class="tab-panel on" id="tp-painel">
+    <div id="projHero"></div>
+    <div class="sec-title">Metas do campeonato</div>
+    <div class="card">
+      <div class="meta-list" id="metaList"></div>
+    </div>
+    <div class="sec-title">Atualizar via Wikipedia</div>
+    <div class="paste-panel">
+      <div class="paste-hint">
+        1. Abra o link Wikipedia no cabeçalho.<br>
+        2. Copie a linha do Bahia (ex: <code>3 Bahia 17 9 5 2 2 12 7 +5</code>).<br>
+        3. Cole abaixo e toque em Atualizar.
+      </div>
+      <textarea id="pasteIn" placeholder="Cole os dados aqui..."></textarea>
+      <div class="paste-actions">
+        <button class="btn-primary" onclick="doPaste()">ATUALIZAR</button>
+        <span class="paste-status" id="pStat"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOGOS -->
+  <div class="tab-panel" id="tp-jogos">
+    <div id="gamesList"></div>
+  </div>
+
+  <!-- BLOCOS -->
+  <div class="tab-panel" id="tp-blocos">
+    <div class="sec-title">Desempenho por bloco</div>
+    <div class="bloco-grid" id="blocoGrid"></div>
+  </div>
+
+  <!-- GRÁFICO -->
+  <div class="tab-panel" id="tp-grafico">
+    <div class="chart-card">
+      <div class="chart-legend">
+        <span class="leg-item"><span class="leg-line" style="background:#1449B0"></span>Bahia 2026</span>
+        <span class="leg-item"><span class="leg-line" style="background:#1449B0;opacity:.35"></span>Projeção</span>
+        <span class="leg-item"><span class="leg-line" style="background:#8A96A8"></span>Média 23–25</span>
+        <span class="leg-item"><span class="leg-line" style="background:#16A34A"></span>Meta G5</span>
+        <span class="leg-item"><span class="leg-line" style="background:#C8102E"></span>Título</span>
+      </div>
+      <div style="position:relative;width:100%;height:260px">
+        <canvas id="mainChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn on" onclick="setTab('painel',0)">
+    <div class="nav-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="2" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="11" y="2" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="2" y="11" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="11" y="11" width="7" height="7" rx="2" fill="#8A96A8"/></svg>
+    </div>
+    <span class="nav-label">Painel</span>
+  </button>
+  <button class="nav-btn" onclick="setTab('jogos',1)">
+    <div class="nav-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="2" rx="1" fill="#8A96A8"/><rect x="3" y="9" width="14" height="2" rx="1" fill="#8A96A8"/><rect x="3" y="14" width="10" height="2" rx="1" fill="#8A96A8"/></svg>
+    </div>
+    <span class="nav-label">Jogos</span>
+  </button>
+  <button class="nav-btn" onclick="setTab('blocos',2)">
+    <div class="nav-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="12" width="4" height="7" rx="1" fill="#8A96A8"/><rect x="8" y="7" width="4" height="12" rx="1" fill="#8A96A8"/><rect x="14" y="3" width="4" height="16" rx="1" fill="#8A96A8"/></svg>
+    </div>
+    <span class="nav-label">Blocos</span>
+  </button>
+  <button class="nav-btn" onclick="setTab('grafico',3)">
+    <div class="nav-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20"><polyline points="2,15 7,9 11,12 18,4" fill="none" stroke="#8A96A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <span class="nav-label">Gráfico</span>
+  </button>
+</nav>
+
+<script>
+var GAMES = [
+  {r:1,opp:'Corinthians',loc:'F',date:'28-29/01',res:'V'},
+  {r:2,opp:'Fluminense',loc:'C',date:'04-05/02',res:'V'},
+  {r:3,opp:'Vasco',loc:'F',date:'11-12/02',res:'V'},
+  {r:4,opp:'Chapecoense',loc:'C',date:'25-26/02',res:'V'},
+  {r:5,opp:'Vitória',loc:'C',date:'11-12/03',res:'V'},
+  {r:6,opp:'Internacional',loc:'F',date:'14-16/03',res:'D'},
+  {r:7,opp:'Bragantino',loc:'C',date:'18-19/03',res:'V'},
+  {r:8,opp:'Remo',loc:'F',date:'21-23/03',res:'V'},
+  {r:9,opp:'Athletico-PR',loc:'C',date:'01-02/04',res:'E'},
+  {r:10,opp:'Palmeiras',loc:'C',date:'04-06/04',res:null},
+  {r:11,opp:'Mirassol',loc:'F',date:'11-13/04',res:null},
+  {r:12,opp:'Flamengo',loc:'F',date:'18-20/04',res:null},
+  {r:13,opp:'Santos',loc:'C',date:'24-26/04',res:null},
+  {r:14,opp:'São Paulo',loc:'F',date:'02-04/05',res:null},
+  {r:15,opp:'Cruzeiro',loc:'C',date:'09-11/05',res:null},
+  {r:16,opp:'Grêmio',loc:'C',date:'16-18/05',res:null},
+  {r:17,opp:'Coritiba',loc:'F',date:'23-25/05',res:null},
+  {r:18,opp:'Botafogo',loc:'C',date:'30/05-01/06',res:null},
+  {r:19,opp:'Atlético-MG',loc:'F',date:'22-23/07',res:null},
+  {r:20,opp:'Corinthians',loc:'C',date:'25-27/07',res:null},
+  {r:21,opp:'Fluminense',loc:'F',date:'29-30/07',res:null},
+  {r:22,opp:'Vasco',loc:'C',date:'08-10/08',res:null},
+  {r:23,opp:'Chapecoense',loc:'F',date:'15-17/08',res:null},
+  {r:24,opp:'Vitória',loc:'F',date:'22-24/08',res:null},
+  {r:25,opp:'Internacional',loc:'C',date:'29-31/08',res:null},
+  {r:26,opp:'Bragantino',loc:'F',date:'05-07/09',res:null},
+  {r:27,opp:'Remo',loc:'C',date:'12-14/09',res:null},
+  {r:28,opp:'Athletico-PR',loc:'F',date:'19-21/09',res:null},
+  {r:29,opp:'Palmeiras',loc:'F',date:'07-08/10',res:null},
+  {r:30,opp:'Mirassol',loc:'C',date:'10-12/10',res:null},
+  {r:31,opp:'Flamengo',loc:'C',date:'17-19/10',res:null},
+  {r:32,opp:'Santos',loc:'F',date:'24-26/10',res:null},
+  {r:33,opp:'São Paulo',loc:'C',date:'28-29/10',res:null},
+  {r:34,opp:'Cruzeiro',loc:'F',date:'04-05/11',res:null},
+  {r:35,opp:'Grêmio',loc:'F',date:'18-19/11',res:null},
+  {r:36,opp:'Coritiba',loc:'C',date:'21-23/11',res:null},
+  {r:37,opp:'Botafogo',loc:'F',date:'28-29/11',res:null},
+  {r:38,opp:'Atlético-MG',loc:'C',date:'02/12',res:null},
+];
+
+var BLOCOS = [
+  {label:'Bloco 1',rds:[1,2,3,4,5],meta:10},
+  {label:'Bloco 2',rds:[6,7,8,9,10],meta:8},
+  {label:'Bloco 3',rds:[11,12,13,14,15,16],meta:9},
+  {label:'Bloco 4',rds:[17,18,19,20,21,22,23],meta:10},
+  {label:'Bloco 5',rds:[24,25,26,27,28,29,30],meta:10},
+  {label:'Final',rds:[31,32,33,34,35,36,37,38],meta:12},
+];
+
+var HIST = (function(){
+  var a=[];var ap=(44+53+60)/(3*38*3);
+  for(var r=1;r<=38;r++) a.push(+(ap*r*3).toFixed(1));
+  return a;
+})();
+
+var chartInst = null;
+var activeTab = 'painel';
+
+function pts(res){ return res==='V'?3:res==='E'?1:res==='D'?0:null; }
+
+function calcState(){
+  var p=0,v=0,e=0,d=0,gj=0;
+  GAMES.forEach(function(g){
+    var x=pts(g.res);
+    if(x!==null){p+=x;if(g.res==='V')v++;else if(g.res==='E')e++;else d++;gj++;}
+  });
+  var aprov=gj>0?p/gj/3*100:0;
+  var proj=gj>0?Math.round(p/gj*38):null;
+  return{p,v,e,d,gj,aprov,proj};
+}
+
+function firstUnplayed(){
+  for(var i=0;i<GAMES.length;i++) if(GAMES[i].res===null) return i;
+  return -1;
+}
+
+function setTab(id, idx){
+  activeTab = id;
+  document.querySelectorAll('.tab-panel').forEach(function(el){ el.classList.remove('on'); });
+  document.getElementById('tp-'+id).classList.add('on');
+  document.querySelectorAll('.nav-btn').forEach(function(b,i){ b.classList.toggle('on', i===idx); });
+  if(id==='grafico') renderChart();
+}
+
+function setRes(i, val){
+  GAMES[i].res = val===''?null:val;
+  renderAll();
+}
+
+function renderAll(){
+  var s=calcState();
+  // header strip
+  document.getElementById('sh-pos').textContent = '3°'; // posição não inferida da simulação
+  document.getElementById('sh-pts').textContent = s.p;
+  document.getElementById('sh-aprov').textContent = s.aprov.toFixed(1)+'%';
+  document.getElementById('sh-proj').textContent = s.proj||'—';
+  renderProjHero(s);
+  renderMetas(s);
+  renderGames();
+  renderBlocos();
+  if(activeTab==='grafico') renderChart();
+}
+
+function renderProjHero(s){
+  var el=document.getElementById('projHero');
+  var proj=s.proj||0;
+  var color=proj>=63?'#6BDFA3':proj>=48?'#FAD166':'#FF8080';
+  el.innerHTML='<div class="proj-hero">'
+    +'<div class="proj-left">'
+    +'<div class="proj-label">Projeção final</div>'
+    +'<div class="proj-num">'+( s.proj||'—' )+'</div>'
+    +'<div class="proj-sub">pontos em 38 jogos</div>'
+    +'</div>'
+    +'<div class="proj-right">'
+    +'<div class="proj-aprov-val" style="color:'+color+'">'+s.aprov.toFixed(1)+'%</div>'
+    +'<div class="proj-aprov-lbl">aproveitamento</div>'
+    +'<div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.55)">'+s.gj+' jogos · '+(38-s.gj)+' restantes</div>'
+    +'</div>'
+    +'</div>';
+}
+
+function renderMetas(s){
+  var rest=38-s.gj;
+  var metas=[
+    {l:'Título',meta:80,color:'#C8102E',dot:'#E8102E'},
+    {l:'G5 — Libertadores',meta:63,color:'#0A2D6E',dot:'#1449B0'},
+    {l:'Qualy Libertadores',meta:58,color:'#1E5FD4',dot:'#378ADD'},
+    {l:'Sudamericana',meta:48,color:'#8A96A8',dot:'#8A96A8'},
+  ];
+  var html='';
+  metas.forEach(function(m){
+    var faltam=Math.max(0,m.meta-s.p);
+    var apMin=rest>0?Math.round(faltam/rest/3*1000)/10:0;
+    var pct=Math.min(100,Math.round(s.p/m.meta*100));
+    var ok=s.p>=m.meta;
+    html+='<div class="meta-row">'
+      +'<span class="meta-dot" style="background:'+m.dot+'"></span>'
+      +'<div class="meta-info">'
+        +'<div class="meta-name">'+m.l+'</div>'
+        +'<div class="meta-sub">'+(ok?'Meta atingida':'min. '+apMin+'% de aproveit.')+'</div>'
+        +'<div class="meta-bar-wrap"><div class="meta-bar" style="width:'+pct+'%;background:'+m.color+'"></div></div>'
+      +'</div>'
+      +'<div style="text-align:right">'
+        +'<div class="meta-pts" style="color:'+m.color+'">'+(ok?'✓':faltam)+'</div>'
+        +'<span class="meta-tag '+(ok?'tag-ok':'tag-pend')+'">'+(ok?'OK':faltam+' pts')+'</span>'
+      +'</div>'
+      +'</div>';
+  });
+  document.getElementById('metaList').innerHTML=html;
+}
+
+function renderGames(){
+  var el=document.getElementById('gamesList');
+  var html='';
+  var prevTurn=0;
+  var nextIdx=firstUnplayed();
+  GAMES.forEach(function(g,i){
+    var turn=g.r<=19?1:2;
+    if(turn!==prevTurn){
+      html+='<div class="turn-label">'+(turn===1?'Primeiro Turno':'Returno')+'</div>';
+      prevTurn=turn;
+    }
+    var p=pts(g.res);
+    var cardCls='game-card'+(g.res==='V'?' played-w':g.res==='E'?' played-e':g.res==='D'?' played-l':i===nextIdx?' next-game':'');
+    var ptsCls=g.res==='V'?'gpts-w':g.res==='E'?'gpts-e':g.res==='D'?'gpts-l':'gpts-p';
+    var ptsStr=p!==null?p:'·';
+    html+='<div class="'+cardCls+'">'
+      +'<div class="game-rnd">'+g.r+'</div>'
+      +'<div class="game-info">'
+        +'<div class="game-opp">'+g.opp+'</div>'
+        +'<div class="game-meta"><span class="loc-badge '+(g.loc==='C'?'loc-c':'loc-f')+'">'+g.loc+'</span>'+g.date+'</div>'
+      +'</div>'
+      +'<div class="game-pts-col '+ptsCls+'">'+ptsStr+'</div>'
+      +'<div class="game-sel-col">'
+        +'<select class="res-sel" onchange="setRes('+i+',this.value)">'
+          +'<option value="" '+(g.res===null?'selected':'')+'>—</option>'
+          +'<option value="V" '+(g.res==='V'?'selected':'')+'>Vitória</option>'
+          +'<option value="E" '+(g.res==='E'?'selected':'')+'>Empate</option>'
+          +'<option value="D" '+(g.res==='D'?'selected':'')+'>Derrota</option>'
+        +'</select>'
+      +'</div>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+function renderBlocos(){
+  var html='';
+  var cumPts=0;
+  BLOCOS.forEach(function(b){
+    var bPts=0,bPlayed=0;
+    b.rds.forEach(function(r){ var g=GAMES[r-1];var p=pts(g.res);if(p!==null){bPts+=p;bPlayed++;} });
+    var all=bPlayed===b.rds.length;
+    var any=bPlayed>0;
+    if(any) cumPts+=bPts;
+    var cls=all?(bPts>=b.meta?'ok':'fail'):(any?'partial':'');
+    var badgeCls=all?(bPts>=b.meta?'bb-ok':'bb-fail'):(any?'bb-partial':'bb-pend');
+    var badgeTxt=all?(bPts>=b.meta?'Meta ok':'Abaixo'):(any?bPlayed+'/'+b.rds.length+' jogos':'Pendente');
+    var realColor=all?(bPts>=b.meta?'green':'red'):(any?'amber':'muted');
+    html+='<div class="bloco-card '+cls+'">'
+      +'<div class="bloco-head"><span class="bloco-name">'+b.label+'</span><span class="bloco-badge '+badgeCls+'">'+badgeTxt+'</span></div>'
+      +'<div class="bloco-pts-row"><span class="bloco-real '+realColor+'">'+(any?bPts:'—')+'</span><span class="bloco-sep"> / </span><span class="bloco-meta">'+b.meta+'</span></div>'
+      +'<div class="bloco-sub">R'+b.rds[0]+'–R'+b.rds[b.rds.length-1]+' · '+b.rds.length+' jogos</div>'
+      +(any?'<div class="bloco-accum">Acumulado: '+cumPts+' pts</div>':'')
+      +'</div>';
+  });
+  document.getElementById('blocoGrid').innerHTML=html;
+}
+
+function buildCumulative(){
+  var real=[],proj=[];
+  var running=0,played=0;
+  GAMES.forEach(function(g,i){
+    var p=pts(g.res);
+    if(p!==null){running+=p;played++;}
+    if(p!==null){real.push(running);proj.push(null);}
+    else if(played>0){real.push(null);proj.push(Math.round(running/played*(i+1)));}
+    else{real.push(null);proj.push(null);}
+  });
+  return{real,proj};
+}
+
+function renderChart(){
+  var c=buildCumulative();
+  var labs=GAMES.map(function(g){return 'R'+g.r;});
+  var mL=Array(38).fill(63),mT=Array(38).fill(80);
+  if(chartInst) chartInst.destroy();
+  chartInst=new Chart(document.getElementById('mainChart'),{
+    type:'line',
+    data:{labels:labs,datasets:[
+      {data:c.real,borderColor:'#1449B0',pointRadius:0,borderWidth:2.5,tension:0.4,spanGaps:false},
+      {data:c.proj,borderColor:'#1449B0',pointRadius:0,borderWidth:1.5,borderDash:[5,4],tension:0.4,spanGaps:false},
+      {data:HIST,borderColor:'#8A96A8',pointRadius:0,borderWidth:1.5,tension:0.3},
+      {data:mL,borderColor:'#16A34A',pointRadius:0,borderWidth:1,borderDash:[4,4]},
+      {data:mT,borderColor:'#C8102E',pointRadius:0,borderWidth:1,borderDash:[4,4]},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{titleFont:{size:11},bodyFont:{size:11}}},
+      scales:{
+        x:{ticks:{color:'#8A96A8',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(10,45,110,0.06)'}},
+        y:{min:0,max:85,ticks:{color:'#8A96A8',font:{size:9},stepSize:15},grid:{color:'rgba(10,45,110,0.06)'}}
+      }
+    }
+  });
+}
+
+function doPaste(){
+  var raw=document.getElementById('pasteIn').value.trim();
+  if(!raw){document.getElementById('pStat').textContent='Cole os dados antes.';return;}
+  var nums=raw.match(/\d+/g);
+  if(!nums||nums.length<7){document.getElementById('pStat').textContent='Formato não reconhecido.';return;}
+  var idx=0;
+  if(nums.length>=8) idx++;
+  var gj=+nums[idx+1],v=+nums[idx+2],e=+nums[idx+3],d=+nums[idx+4];
+  var seq=[];
+  for(var i=0;i<v;i++) seq.push('V');
+  for(var i=0;i<e;i++) seq.push('E');
+  for(var i=0;i<d;i++) seq.push('D');
+  var played=0;
+  GAMES.forEach(function(g,i){
+    if(i<gj&&seq[played]!==undefined){g.res=seq[played];played++;}
+    else if(i>=gj) g.res=null;
+  });
+  renderAll();
+  document.getElementById('pStat').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('pasteIn').value='';
+}
+
+renderAll();
+</script>
+</body>
+</html>

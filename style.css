@@ -1,0 +1,262 @@
+/* ===========================
+   Bora Bahêa! – Global Styles
+   Cores oficiais: Azul #0033A0 / Vermelho #E63226 / Amarelo #FBCE07
+   =========================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f0f4ff;
+  color: #1a1a2e;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Header ---- */
+header {
+  background: linear-gradient(135deg, #0033A0 0%, #001f6b 100%);
+  color: #fff;
+  padding: 2rem 1rem 2.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+header::after {
+  content: '';
+  display: block;
+  height: 6px;
+  background: #FBCE07;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.header-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.badge {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+header h1 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+  opacity: 0.9;
+  color: #FBCE07;
+}
+
+/* ---- Main layout ---- */
+main {
+  flex: 1;
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+/* ---- Summary cards ---- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.card {
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+}
+
+.card--win    { background: #1a7a3c; }
+.card--draw   { background: #5a5a8a; }
+.card--loss   { background: #c0392b; }
+.card--points { background: #0033A0; }
+
+.card__number {
+  display: block;
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.card__label {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* ---- Results section ---- */
+.results, .add-match {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+
+.results h2, .add-match h2 {
+  font-size: 1.3rem;
+  color: #0033A0;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #FBCE07;
+  padding-bottom: 0.4rem;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+thead {
+  background: #0033A0;
+  color: #fff;
+}
+
+thead th {
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid #e8ecf4;
+  transition: background 0.15s;
+}
+
+tbody tr:hover {
+  background: #f0f4ff;
+}
+
+tbody td {
+  padding: 0.65rem 0.9rem;
+  white-space: nowrap;
+}
+
+.result-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.result-badge--win  { background: #d4f4e2; color: #1a7a3c; }
+.result-badge--draw { background: #e8e8f4; color: #5a5a8a; }
+.result-badge--loss { background: #fde8e8; color: #c0392b; }
+
+.empty-message {
+  text-align: center;
+  color: #888;
+  padding: 1rem 0;
+  font-style: italic;
+}
+
+/* ---- Add match form ---- */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.9rem;
+}
+
+.form-row label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-row input {
+  padding: 0.6rem 0.8rem;
+  border: 1.5px solid #ccd3e8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.form-row input:focus {
+  outline: none;
+  border-color: #0033A0;
+  box-shadow: 0 0 0 3px rgba(0,51,160,0.1);
+}
+
+@media (min-width: 540px) {
+  #match-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 1.5rem;
+  }
+  .btn-add {
+    grid-column: 1 / -1;
+  }
+}
+
+.btn-add {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #0033A0;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  width: 100%;
+}
+
+.btn-add:hover {
+  background: #001f6b;
+}
+
+.btn-add:active {
+  transform: scale(0.98);
+}
+
+/* ---- Footer ---- */
+footer {
+  background: #0033A0;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.85rem;
+}

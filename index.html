@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<<<<<<< HEAD
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Bora Bahea 2026 — Brasileirão Tracker</title>
@@ -701,5 +702,103 @@ var now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
 document.getElementById('tsHeader').textContent=now;
 renderAll();
 </script>
+=======
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bora Bahêa! – Desempenho 2026</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="badge">⚽</div>
+      <h1>Bora Bahêa!</h1>
+      <p class="subtitle">Acompanhe o desempenho do <strong>Esporte Clube Bahia</strong> na temporada 2026</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- Summary cards -->
+    <section class="cards">
+      <div class="card card--win">
+        <span class="card__number" id="wins">0</span>
+        <span class="card__label">Vitórias</span>
+      </div>
+      <div class="card card--draw">
+        <span class="card__number" id="draws">0</span>
+        <span class="card__label">Empates</span>
+      </div>
+      <div class="card card--loss">
+        <span class="card__number" id="losses">0</span>
+        <span class="card__label">Derrotas</span>
+      </div>
+      <div class="card card--points">
+        <span class="card__number" id="points">0</span>
+        <span class="card__label">Pontos</span>
+      </div>
+    </section>
+
+    <!-- Results table -->
+    <section class="results">
+      <h2>Últimos Jogos</h2>
+      <div class="table-wrapper">
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Mandante</th>
+              <th>Placar</th>
+              <th>Visitante</th>
+              <th>Competição</th>
+              <th>Resultado</th>
+            </tr>
+          </thead>
+          <tbody id="results-body">
+            <!-- Rows inserted by JS -->
+          </tbody>
+        </table>
+      </div>
+      <p class="empty-message" id="empty-msg">Nenhum jogo registrado ainda. Aguarde o início da temporada! 🟡🔵</p>
+    </section>
+
+    <!-- Add match form -->
+    <section class="add-match">
+      <h2>Registrar Jogo</h2>
+      <form id="match-form">
+        <div class="form-row">
+          <label for="match-date">Data</label>
+          <input type="date" id="match-date" required />
+        </div>
+        <div class="form-row">
+          <label for="home-team">Mandante</label>
+          <input type="text" id="home-team" placeholder="Ex: Bahia" required />
+        </div>
+        <div class="form-row">
+          <label for="home-score">Gols Mandante</label>
+          <input type="number" id="home-score" min="0" value="0" required />
+        </div>
+        <div class="form-row">
+          <label for="away-team">Visitante</label>
+          <input type="text" id="away-team" placeholder="Ex: Flamengo" required />
+        </div>
+        <div class="form-row">
+          <label for="away-score">Gols Visitante</label>
+          <input type="number" id="away-score" min="0" value="0" required />
+        </div>
+        <div class="form-row">
+          <label for="competition">Competição</label>
+          <input type="text" id="competition" placeholder="Ex: Brasileirão Série A" required />
+        </div>
+        <button type="submit" class="btn-add">Adicionar Jogo</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>Feito com ❤️ por torcedores do Tricolor de Aço &bull; Temporada 2026</p>
+  </footer>
+
+  <script src="app.js"></script>
+>>>>>>> 4f40b6ac60534ddf4ff85534f01b4565fee949c1
 </body>
 </html>

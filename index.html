@@ -3,979 +3,702 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Bahia 2026 — Brasileirão Tracker</title>
+<title>Bora Bahea 2026 — Brasileirão Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root {
-  --azul: #0A2D6E;
-  --azul-mid: #1449B0;
-  --azul-light: #1E5FD4;
-  --vermelho: #C8102E;
-  --vermelho-dark: #9B0D23;
-  --branco: #FFFFFF;
-  --cinza-bg: #F0F2F7;
-  --cinza-card: #FFFFFF;
-  --cinza-border: rgba(10,45,110,0.12);
-  --cinza-text: #4A5568;
-  --cinza-muted: #8A96A8;
-  --sombra: 0 2px 12px rgba(10,45,110,0.10);
-  --sombra-forte: 0 4px 20px rgba(10,45,110,0.18);
-  --radius: 14px;
-  --radius-sm: 8px;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-body {
-  font-family: 'Barlow', sans-serif;
-  background: var(--cinza-bg);
-  color: var(--azul);
-  min-height: 100vh;
-  max-width: 480px;
-  margin: 0 auto;
-  position: relative;
-}
-
-/* ─── HEADER ─── */
-.app-header {
-  background: var(--azul);
-  padding: 48px 20px 20px;
-  position: relative;
-  overflow: hidden;
-}
-.app-header::before {
-  content: '';
-  position: absolute;
-  top: -40px; right: -40px;
-  width: 160px; height: 160px;
-  border-radius: 50%;
-  background: rgba(200,16,46,0.18);
-}
-.app-header::after {
-  content: '';
-  position: absolute;
-  bottom: -20px; left: 30px;
-  width: 100px; height: 100px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.04);
-}
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  position: relative;
-  z-index: 1;
-}
-.logo-area {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.logo-circle {
-  width: 48px; height: 48px;
-  border-radius: 50%;
-  background: var(--branco);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 0 3px rgba(200,16,46,0.5);
-  flex-shrink: 0;
-}
-.logo-name h1 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--branco);
-  letter-spacing: 0.02em;
-  line-height: 1;
-}
-.logo-name p {
-  font-size: 11px;
-  color: rgba(255,255,255,0.55);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  margin-top: 2px;
-}
-.wiki-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 20px;
-  padding: 6px 11px;
-  color: rgba(255,255,255,0.85);
-  font-size: 11px;
-  font-weight: 500;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.wiki-btn:hover { background: rgba(255,255,255,0.18); }
-
-/* Stat strip no header */
-.stat-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  position: relative;
-  z-index: 1;
-}
-.stat-item {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
-  padding: 8px 6px;
-  text-align: center;
-}
-.stat-val {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--branco);
-  line-height: 1;
-}
-.stat-val.red { color: #FF6B6B; }
-.stat-val.green { color: #6BDFA3; }
-.stat-lbl {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
-  margin-top: 2px;
-}
-
-/* ─── BOTTOM NAV ─── */
-.bottom-nav {
-  position: sticky;
-  bottom: 0;
-  background: var(--branco);
-  border-top: 1px solid var(--cinza-border);
-  display: flex;
-  z-index: 100;
-  box-shadow: 0 -4px 20px rgba(10,45,110,0.10);
-}
-.nav-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 4px 12px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  gap: 4px;
-  position: relative;
-}
-.nav-btn.on::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 20%; right: 20%;
-  height: 3px;
-  background: var(--vermelho);
-  border-radius: 0 0 3px 3px;
-}
-.nav-icon {
-  width: 22px; height: 22px;
-  display: flex; align-items: center; justify-content: center;
-}
-.nav-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--cinza-muted);
-}
-.nav-btn.on .nav-label { color: var(--azul); }
-.nav-btn.on .nav-icon svg path,
-.nav-btn.on .nav-icon svg rect,
-.nav-btn.on .nav-icon svg circle { fill: var(--azul); }
-
-/* ─── CONTENT ─── */
-.content {
-  padding: 16px;
-  padding-bottom: 80px;
-}
-.tab-panel { display: none; }
-.tab-panel.on { display: block; }
-
-/* ─── SECTION TITLE ─── */
-.sec-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--azul);
-  margin: 20px 0 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.sec-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--cinza-border);
-}
-.sec-title:first-child { margin-top: 4px; }
-
-/* ─── CARDS ─── */
-.card {
-  background: var(--cinza-card);
-  border-radius: var(--radius);
-  box-shadow: var(--sombra);
-  border: 1px solid var(--cinza-border);
-  overflow: hidden;
-}
-.card + .card { margin-top: 10px; }
-
-/* ─── METAS ─── */
-.meta-list { padding: 4px 0; }
-.meta-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--cinza-border);
-}
-.meta-row:last-child { border-bottom: none; }
-.meta-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.meta-info { flex: 1; min-width: 0; }
-.meta-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--azul);
-}
-.meta-sub {
-  font-size: 11px;
-  color: var(--cinza-text);
-  margin-top: 1px;
-}
-.meta-bar-wrap {
-  width: 70px;
-  height: 4px;
-  background: var(--cinza-bg);
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-.meta-bar { height: 100%; border-radius: 999px; transition: width .5s; }
-.meta-pts {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  text-align: right;
-  min-width: 52px;
-}
-.meta-tag {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 999px;
-  letter-spacing: 0.04em;
-}
-.tag-ok { background: #DCFCE7; color: #166534; }
-.tag-pend { background: #EFF6FF; color: #1E40AF; }
-
-/* ─── BLOCOS ─── */
-.bloco-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.bloco-card {
-  background: var(--cinza-card);
-  border-radius: var(--radius-sm);
-  border: 1.5px solid var(--cinza-border);
-  padding: 12px;
-  box-shadow: var(--sombra);
-}
-.bloco-card.ok { border-color: #16A34A; background: #F0FDF4; }
-.bloco-card.fail { border-color: #DC2626; background: #FEF2F2; }
-.bloco-card.partial { border-color: #D97706; background: #FFFBEB; }
-.bloco-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 6px;
-}
-.bloco-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--azul);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.bloco-badge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 999px;
-}
-.bb-ok { background: #DCFCE7; color: #166534; }
-.bb-fail { background: #FEE2E2; color: #991B1B; }
-.bb-pend { background: #F1F5F9; color: #475569; }
-.bb-partial { background: #FEF3C7; color: #92400E; }
-.bloco-pts-row {
-  display: flex;
-  align-items: baseline;
-  gap: 3px;
-}
-.bloco-real {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
-}
-.bloco-real.green { color: #16A34A; }
-.bloco-real.red { color: #DC2626; }
-.bloco-real.amber { color: #D97706; }
-.bloco-real.muted { color: var(--cinza-muted); }
-.bloco-sep { font-size: 13px; color: var(--cinza-muted); }
-.bloco-meta { font-size: 15px; color: var(--cinza-text); }
-.bloco-sub { font-size: 10px; color: var(--cinza-muted); margin-top: 3px; }
-.bloco-accum { font-size: 10px; color: var(--cinza-text); margin-top: 5px; font-weight: 600; }
-
-/* ─── JOGOS ─── */
-.turn-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--branco);
-  background: var(--azul-mid);
-  padding: 6px 14px;
-  border-radius: var(--radius-sm);
-  margin: 14px 0 6px;
-  display: inline-block;
-}
-.game-card {
-  background: var(--cinza-card);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--cinza-border);
-  display: grid;
-  grid-template-columns: 28px 1fr auto auto;
-  gap: 0;
-  align-items: stretch;
-  margin-bottom: 4px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(10,45,110,0.06);
-}
-.game-card.played-w { border-left: 3px solid #16A34A; }
-.game-card.played-e { border-left: 3px solid #2563EB; }
-.game-card.played-l { border-left: 3px solid #DC2626; }
-.game-card.next-game { border-left: 3px solid var(--vermelho); background: #FFF8F8; }
-.game-rnd {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--cinza-muted);
-  background: var(--cinza-bg);
-  border-right: 1px solid var(--cinza-border);
-  min-width: 28px;
-}
-.game-info {
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-}
-.game-opp {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--azul);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.game-meta {
-  font-size: 10px;
-  color: var(--cinza-muted);
-  margin-top: 1px;
-}
-.loc-badge {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: 3px;
-  margin-right: 3px;
-}
-.loc-c { background: var(--azul); color: white; }
-.loc-f { background: var(--cinza-bg); color: var(--cinza-text); border: 1px solid var(--cinza-border); }
-.game-pts-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 30px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  border-left: 1px solid var(--cinza-border);
-}
-.gpts-w { color: #16A34A; }
-.gpts-e { color: #2563EB; }
-.gpts-l { color: #DC2626; }
-.gpts-p { color: var(--cinza-bg); }
-.game-sel-col {
-  display: flex;
-  align-items: center;
-  padding: 0 6px;
-  border-left: 1px solid var(--cinza-border);
-}
-.res-sel {
-  font-size: 11px;
-  font-weight: 600;
-  border: 1px solid var(--cinza-border);
-  border-radius: 6px;
-  padding: 4px 5px;
-  background: var(--cinza-bg);
-  color: var(--azul);
-  cursor: pointer;
-  width: 72px;
-  appearance: none;
-  text-align: center;
-}
-
-/* ─── PASTE PANEL ─── */
-.paste-panel {
-  background: var(--cinza-card);
-  border-radius: var(--radius);
-  border: 1px solid var(--cinza-border);
-  padding: 14px;
-  box-shadow: var(--sombra);
-}
-.paste-hint {
-  font-size: 12px;
-  color: var(--cinza-text);
-  line-height: 1.55;
-  margin-bottom: 10px;
-}
-.paste-hint code {
-  font-family: monospace;
-  background: var(--cinza-bg);
-  padding: 1px 5px;
-  border-radius: 4px;
-  font-size: 11px;
-  color: var(--azul);
-}
-.paste-panel textarea {
-  width: 100%;
-  background: var(--cinza-bg);
-  border: 1px solid var(--cinza-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  font-size: 12px;
-  color: var(--azul);
-  resize: vertical;
-  min-height: 60px;
-  font-family: monospace;
-}
-.paste-panel textarea:focus { outline: none; border-color: var(--azul-mid); }
-.paste-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  align-items: center;
-}
-.btn-primary {
-  background: var(--azul);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  font-family: 'Barlow Condensed', sans-serif;
-}
-.btn-primary:active { background: var(--azul-mid); transform: scale(0.98); }
-.paste-status { font-size: 11px; color: #16A34A; font-weight: 500; }
-
-/* ─── GRÁFICO ─── */
-.chart-card {
-  background: var(--cinza-card);
-  border-radius: var(--radius);
-  border: 1px solid var(--cinza-border);
-  padding: 14px;
-  box-shadow: var(--sombra);
-}
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 14px;
-  margin-bottom: 12px;
-}
-.leg-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--cinza-text);
-}
-.leg-line {
-  width: 16px;
-  height: 3px;
-  border-radius: 2px;
-}
-
-/* ─── PROJEÇÃO CARD ─── */
-.proj-hero {
-  background: var(--azul);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-.proj-hero::before {
-  content: '';
-  position: absolute;
-  right: -20px; top: -20px;
-  width: 100px; height: 100px;
-  border-radius: 50%;
-  background: rgba(200,16,46,0.2);
-}
-.proj-left { position: relative; z-index: 1; }
-.proj-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.55);
-  margin-bottom: 2px;
-}
-.proj-num {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 52px;
-  font-weight: 800;
-  color: var(--branco);
-  line-height: 1;
-}
-.proj-sub { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; }
-.proj-right {
-  position: relative;
-  z-index: 1;
-  text-align: right;
-}
-.proj-aprov-val {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 28px;
-  font-weight: 800;
-  color: #6BDFA3;
-  line-height: 1;
-}
-.proj-aprov-lbl { font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 1px; }
-
-/* ─── FADE IN ─── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.tab-panel.on { animation: fadeUp 0.2s ease; }
+:root{--azul:#0A2D6E;--azul-mid:#1449B0;--vermelho:#C8102E;--branco:#FFFFFF;--cinza-bg:#EEF1F8;--cinza-card:#FFFFFF;--cinza-border:rgba(10,45,110,0.11);--cinza-text:#4A5568;--cinza-muted:#8A96A8;--verde:#16A34A;--amarelo:#D97706;--sombra:0 2px 12px rgba(10,45,110,0.09);--sombra-forte:0 4px 24px rgba(10,45,110,0.16);--radius:16px;--radius-sm:10px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Barlow',sans-serif;background:var(--cinza-bg);color:var(--azul);min-height:100vh;max-width:480px;margin:0 auto}
+.app-header{background:linear-gradient(160deg,#081F50 0%,#0A2D6E 55%,#1449B0 100%);padding:48px 18px 18px;position:relative;overflow:hidden}
+.app-header::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(200,16,46,.28) 0%,transparent 70%)}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;position:relative;z-index:1}
+.logo-area{display:flex;align-items:center;gap:12px}
+.logo-circle{width:50px;height:50px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(200,16,46,.55),0 4px 12px rgba(0,0,0,.2);flex-shrink:0}
+.logo-name h1{font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:900;color:#fff;letter-spacing:.02em;line-height:1}
+.logo-name p{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;letter-spacing:.1em;margin-top:2px;text-transform:uppercase}
+.header-actions{display:flex;gap:6px}
+.icon-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:50%;cursor:pointer;color:rgba(255,255,255,.8);text-decoration:none;font-size:12px;font-weight:700;transition:background .2s}
+.icon-btn:hover{background:rgba(255,255,255,.2)}
+.icon-btn.spinning{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;position:relative;z-index:1}
+.stat-item{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);border-radius:10px;padding:8px 5px;text-align:center}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;line-height:1}
+.stat-val.red{color:#FF7070}.stat-val.green{color:#5EE8A0}.stat-val.amber{color:#FBBF24}
+.stat-lbl{font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-top:2px}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.06em;margin-top:10px;position:relative;z-index:1}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#5EE8A0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.bottom-nav{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--cinza-border);display:flex;z-index:100;box-shadow:0 -4px 20px rgba(10,45,110,.10)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 12px;border:none;background:transparent;cursor:pointer;gap:4px;position:relative}
+.nav-btn.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;background:var(--vermelho);border-radius:0 0 4px 4px}
+.nav-icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--cinza-muted)}
+.nav-btn.on .nav-label{color:var(--azul)}
+.content{padding:14px;padding-bottom:80px}
+.tab-panel{display:none}.tab-panel.on{display:block;animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--azul);margin:18px 0 9px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--cinza-border)}
+.sec-title:first-child{margin-top:4px}
+.card{background:var(--cinza-card);border-radius:var(--radius);box-shadow:var(--sombra);border:1px solid var(--cinza-border);overflow:hidden}
+/* PROJ HERO */
+.proj-hero{background:linear-gradient(135deg,#081F50 0%,#1449B0 100%);border-radius:var(--radius);padding:18px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;box-shadow:var(--sombra-forte)}
+.proj-hero::before{content:'';position:absolute;right:-20px;top:-20px;width:110px;height:110px;border-radius:50%;background:rgba(200,16,46,.22)}
+.proj-hero::after{content:'';position:absolute;left:-10px;bottom:-30px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.04)}
+.proj-left{position:relative;z-index:1}
+.proj-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:2px}
+.proj-num{font-family:'Barlow Condensed',sans-serif;font-size:58px;font-weight:900;color:#fff;line-height:1}
+.proj-sub{font-size:11px;color:rgba(255,255,255,.48);margin-top:3px}
+.proj-right{position:relative;z-index:1;text-align:right}
+.proj-aprov-val{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;line-height:1}
+.proj-aprov-lbl{font-size:10px;color:rgba(255,255,255,.42);margin-top:1px}
+.proj-meta-badges{margin-top:10px;display:flex;flex-wrap:wrap;gap:4px}
+.proj-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.04em}
+.pb-ating{background:rgba(94,232,160,.18);color:#5EE8A0;border:1px solid rgba(94,232,160,.3)}
+.pb-risco{background:rgba(251,191,36,.18);color:#FBBF24;border:1px solid rgba(251,191,36,.3)}
+.pb-fora{background:rgba(255,100,100,.18);color:#FF7070;border:1px solid rgba(255,100,100,.3)}
+/* STAT CARD */
+.stat-card{background:var(--cinza-card);border-radius:var(--radius);box-shadow:var(--sombra);border:1px solid var(--cinza-border);padding:16px}
+.stat-card-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza-muted);margin-bottom:14px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.stat-box{background:var(--cinza-bg);border-radius:var(--radius-sm);padding:10px 6px;text-align:center;border:1px solid var(--cinza-border)}
+.stat-box-val{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;line-height:1;color:var(--azul)}
+.stat-box-val.green{color:var(--verde)}.stat-box-val.amber{color:var(--amarelo)}.stat-box-val.red{color:var(--vermelho)}
+.stat-box-lbl{font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cinza-muted);margin-top:2px}
+.goals-row{display:flex;gap:8px;margin-bottom:12px}
+.goal-chip{flex:1;background:var(--cinza-bg);border-radius:var(--radius-sm);padding:9px 10px;text-align:center;border:1px solid var(--cinza-border)}
+.goal-chip-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;line-height:1}
+.goal-chip-val.green{color:var(--verde)}.goal-chip-val.red{color:var(--vermelho)}.goal-chip-val.amber{color:var(--amarelo)}
+.goal-chip-lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cinza-muted);margin-top:1px}
+.aprov-bar-wrap{height:8px;background:var(--cinza-bg);border-radius:999px;overflow:hidden;border:1px solid var(--cinza-border)}
+.aprov-bar{height:100%;border-radius:999px;transition:width .6s ease}
+.aprov-label{display:flex;justify-content:space-between;font-size:10px;color:var(--cinza-muted);margin-top:4px;font-weight:600}
+.last5-row{display:flex;gap:4px;margin-top:10px;align-items:center}
+.last5-lbl{font-size:10px;font-weight:700;color:var(--cinza-muted);letter-spacing:.06em;text-transform:uppercase;margin-right:4px}
+.l5-chip{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;font-family:'Barlow Condensed',sans-serif}
+.l5-v{background:#DCFCE7;color:#166534}.l5-e{background:#EFF6FF;color:#1E40AF}.l5-d{background:#FEE2E2;color:#991B1B}
+/* METAS */
+.meta-list{padding:4px 0}
+.meta-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--cinza-border)}
+.meta-row:last-child{border-bottom:none}
+.meta-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.meta-info{flex:1;min-width:0}
+.meta-name{font-size:13px;font-weight:700;color:var(--azul)}
+.meta-sub{font-size:11px;color:var(--cinza-text);margin-top:1px}
+.meta-bar-wrap{width:70px;height:4px;background:var(--cinza-bg);border-radius:999px;overflow:hidden;margin-top:5px}
+.meta-bar{height:100%;border-radius:999px;transition:width .5s}
+.meta-pts{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;text-align:right;min-width:44px}
+.meta-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:999px;letter-spacing:.04em}
+.tag-ok{background:#DCFCE7;color:#166534}.tag-pend{background:#EFF6FF;color:#1E40AF}
+/* TABELA */
+.tabela-wrap{overflow-x:auto}
+.tabela{width:100%;border-collapse:collapse;font-size:11.5px}
+.tabela thead th{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--cinza-muted);padding:10px 4px;border-bottom:2px solid var(--cinza-border);text-align:center;background:var(--cinza-bg);white-space:nowrap}
+.tabela thead th.th-time{text-align:left;padding-left:8px}
+.tabela tbody tr{border-bottom:1px solid var(--cinza-border);transition:background .15s}
+.tabela tbody tr:hover{background:var(--cinza-bg)}
+.tabela tbody tr:last-child{border-bottom:none}
+.tabela td{padding:7px 4px;text-align:center;color:var(--azul);font-weight:500}
+.tabela tbody tr.bahia-row{background:rgba(20,73,176,.07)}
+.tabela tbody tr.bahia-row td{font-weight:700}
+.zona-sep td{border-top:2px dashed rgba(10,45,110,.12)}
+.pos-cell{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;padding-left:8px!important;text-align:left!important;white-space:nowrap}
+.zona-pip{display:inline-block;width:4px;height:15px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.team-cell{text-align:left!important;padding-left:6px!important}
+.team-inner{display:flex;align-items:center;gap:6px}
+.team-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--cinza-bg)}
+.team-nm{font-size:12px;font-weight:700;white-space:nowrap}
+.team-nm.bahia{color:var(--azul-mid);font-weight:900}
+.pts-cell{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900}
+.l5-mini{display:flex;gap:2px;justify-content:center}
+.l5m{width:13px;height:13px;border-radius:3px;font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif}
+.l5m.v{background:#DCFCE7;color:#166534}.l5m.e{background:#EFF6FF;color:#1E40AF}.l5m.d{background:#FEE2E2;color:#991B1B}
+.tabela-leg{display:flex;gap:12px;padding:8px 14px;font-size:10px;color:var(--cinza-muted);font-weight:600;flex-wrap:wrap}
+.leg-zona{display:flex;align-items:center;gap:4px}
+.leg-dot{width:8px;height:8px;border-radius:2px}
+/* BLOCOS */
+.bloco-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bloco-card{background:var(--cinza-card);border-radius:var(--radius-sm);border:1.5px solid var(--cinza-border);padding:12px;box-shadow:var(--sombra)}
+.bloco-card.ok{border-color:#16A34A;background:#F0FDF4}.bloco-card.fail{border-color:#DC2626;background:#FEF2F2}.bloco-card.partial{border-color:#D97706;background:#FFFBEB}
+.bloco-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.bloco-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;color:var(--azul);letter-spacing:.04em;text-transform:uppercase}
+.bloco-badge{font-size:8.5px;font-weight:800;padding:2px 6px;border-radius:999px}
+.bb-ok{background:#DCFCE7;color:#166534}.bb-fail{background:#FEE2E2;color:#991B1B}.bb-pend{background:#F1F5F9;color:#475569}.bb-partial{background:#FEF3C7;color:#92400E}
+.bloco-pts-row{display:flex;align-items:baseline;gap:3px}
+.bloco-real{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;line-height:1}
+.bloco-real.green{color:#16A34A}.bloco-real.red{color:#DC2626}.bloco-real.amber{color:#D97706}.bloco-real.muted{color:var(--cinza-muted)}
+.bloco-sep{font-size:13px;color:var(--cinza-muted)}.bloco-meta-v{font-size:15px;color:var(--cinza-text);font-weight:600}
+.bloco-sub{font-size:10px;color:var(--cinza-muted);margin-top:2px}
+.bloco-extras{margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,.07)}
+.saldo-chips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px}
+.saldo-chip{font-size:9px;font-weight:800;padding:2px 7px;border-radius:999px}
+.sp{background:#DCFCE7;color:#166534}.sn{background:#FEE2E2;color:#991B1B}.sz{background:#F1F5F9;color:#475569}
+.bloco-acum{font-size:10px;color:var(--cinza-text);font-weight:700;margin-bottom:6px}
+.sim-wrap{background:rgba(0,0,0,.03);border-radius:6px;padding:7px 8px}
+.sim-title{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza-muted);margin-bottom:5px}
+.sim-line{display:flex;align-items:center;gap:4px;font-size:9.5px;margin-bottom:3px}
+.sim-line:last-child{margin-bottom:0}
+.sim-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sim-txt{color:var(--cinza-text);font-weight:600;flex:1}
+.sim-val{font-weight:900;font-size:10px}
+/* OSC */
+.osc-grid{display:flex;flex-direction:column;gap:6px}
+.osc-row{background:var(--cinza-card);border-radius:var(--radius-sm);border:1px solid var(--cinza-border);padding:10px 14px;display:flex;align-items:center;gap:10px}
+.osc-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--azul);min-width:62px}
+.osc-bar-track{flex:1;height:14px;background:var(--cinza-bg);border-radius:4px;overflow:hidden;display:flex}
+.osc-pos-bar{height:100%;background:linear-gradient(90deg,#16A34A,#4ADE80);transition:width .5s;border-radius:4px 0 0 4px}
+.osc-neg-bar{height:100%;background:linear-gradient(90deg,#FCA5A5,#DC2626);transition:width .5s;border-radius:0 4px 4px 0}
+.osc-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;min-width:38px;text-align:right}
+.osc-val.pos{color:#16A34A}.osc-val.neg{color:#DC2626}.osc-val.zero{color:var(--cinza-muted)}
+/* JOGOS */
+.turn-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--azul-mid);padding:6px 14px;border-radius:var(--radius-sm);margin:14px 0 6px;display:inline-block}
+.game-card{background:var(--cinza-card);border-radius:var(--radius-sm);border:1px solid var(--cinza-border);display:grid;grid-template-columns:28px 1fr auto auto;align-items:stretch;margin-bottom:4px;overflow:hidden;box-shadow:0 1px 4px rgba(10,45,110,.05)}
+.game-card.played-w{border-left:3px solid #16A34A}.game-card.played-e{border-left:3px solid #2563EB}.game-card.played-l{border-left:3px solid #DC2626}.game-card.next-game{border-left:3px solid var(--vermelho);background:#FFF8F8}
+.game-rnd{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--cinza-muted);background:var(--cinza-bg);border-right:1px solid var(--cinza-border);min-width:28px}
+.game-info{padding:8px 10px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.game-opp{font-size:13px;font-weight:700;color:var(--azul);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-meta{font-size:10px;color:var(--cinza-muted);margin-top:1px;display:flex;align-items:center;gap:4px}
+.loc-badge{font-size:9px;font-weight:800;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.loc-c{background:var(--azul);color:white}.loc-f{background:var(--cinza-bg);color:var(--cinza-text);border:1px solid var(--cinza-border)}
+.score-tag{font-size:10px;font-weight:800;color:#1449B0;background:rgba(20,73,176,.08);padding:1px 5px;border-radius:4px}
+.game-pts-col{display:flex;align-items:center;justify-content:center;min-width:30px;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;border-left:1px solid var(--cinza-border)}
+.gpts-w{color:#16A34A}.gpts-e{color:#2563EB}.gpts-l{color:#DC2626}.gpts-p{color:var(--cinza-bg)}
+.game-sel-col{display:flex;align-items:center;padding:0 6px;border-left:1px solid var(--cinza-border)}
+.res-sel{font-size:11px;font-weight:700;border:1px solid var(--cinza-border);border-radius:6px;padding:4px 4px;background:var(--cinza-bg);color:var(--azul);cursor:pointer;width:70px;appearance:none;text-align:center}
+/* GRAFICO */
+.chart-card{background:var(--cinza-card);border-radius:var(--radius);border:1px solid var(--cinza-border);padding:14px;box-shadow:var(--sombra)}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-bottom:12px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--cinza-text)}
+.leg-line{width:18px;height:3px;border-radius:2px}
+.last-update{font-size:10px;color:var(--cinza-muted);font-weight:600;text-align:center;padding:10px 0 4px;letter-spacing:.04em}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="app-header">
   <div class="header-top">
     <div class="logo-area">
       <div class="logo-circle">
-        <svg width="34" height="34" viewBox="0 0 34 34">
-          <circle cx="17" cy="17" r="16" fill="#0A2D6E"/>
-          <polygon points="17,3 28,28 6,28" fill="#FFFFFF" opacity="0.12"/>
-          <polygon points="17,6 26,27 8,27" fill="#FFFFFF"/>
-          <polygon points="17,13 24,27 10,27" fill="#C8102E"/>
-        </svg>
+        <svg width="36" height="36" viewBox="0 0 34 34"><circle cx="17" cy="17" r="16" fill="#0A2D6E"/><polygon points="17,3 28,28 6,28" fill="#FFFFFF" opacity="0.12"/><polygon points="17,6 26,27 8,27" fill="#FFFFFF"/><polygon points="17,13 24,27 10,27" fill="#C8102E"/></svg>
       </div>
-      <div class="logo-name">
-        <h1>BAHIA 2026</h1>
-        <p>BRASILEIRÃO TRACKER</p>
-      </div>
+      <div class="logo-name"><h1>BORA BAHEA</h1><p>Brasileirão 2026</p></div>
     </div>
-    <a class="wiki-btn" href="https://en.wikipedia.org/wiki/2026_Campeonato_Brasileiro_S%C3%A9rie_A" target="_blank">
-      <svg width="12" height="12" viewBox="0 0 12 12" style="width:12px;height:12px"><circle cx="6" cy="6" r="5.5" fill="none" stroke="currentColor" stroke-width="1.2"/><text x="6" y="9.5" text-anchor="middle" font-size="7" fill="currentColor" font-weight="700">W</text></svg>
-      Wikipedia
-    </a>
+    <div class="header-actions">
+      <button class="icon-btn" id="refreshBtn" onclick="refreshData()" title="Atualizar">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8A6 6 0 0 1 13.7 5M2.3 11A6 6 0 0 0 14 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M11 4l3 1-1 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12l-3-1 1-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="icon-btn" href="https://en.wikipedia.org/wiki/2026_Campeonato_Brasileiro_S%C3%A9rie_A" target="_blank">W</a>
+    </div>
   </div>
-  <div class="stat-strip" id="statStrip">
-    <div class="stat-item"><div class="stat-val" id="sh-pos">3°</div><div class="stat-lbl">Posição</div></div>
-    <div class="stat-item"><div class="stat-val" id="sh-pts">17</div><div class="stat-lbl">Pontos</div></div>
-    <div class="stat-item"><div class="stat-val green" id="sh-aprov">62,9%</div><div class="stat-lbl">Aproveit.</div></div>
-    <div class="stat-item"><div class="stat-val" id="sh-proj">—</div><div class="stat-lbl">Proj. final</div></div>
+  <div class="stat-strip">
+    <div class="stat-item"><div class="stat-val" id="sh-pos">—</div><div class="stat-lbl">Posição</div></div>
+    <div class="stat-item"><div class="stat-val" id="sh-pts">—</div><div class="stat-lbl">Pontos</div></div>
+    <div class="stat-item"><div class="stat-val" id="sh-aprov">—</div><div class="stat-lbl">Aproveit.</div></div>
+    <div class="stat-item"><div class="stat-val amber" id="sh-proj">—</div><div class="stat-lbl">Projeção</div></div>
   </div>
+  <div class="live-badge"><span class="live-dot"></span>DADOS CARREGADOS · <span id="tsHeader">—</span></div>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
-
-  <!-- PAINEL -->
   <div class="tab-panel on" id="tp-painel">
     <div id="projHero"></div>
+    <div class="sec-title">Desempenho atual</div>
+    <div id="statCard"></div>
     <div class="sec-title">Metas do campeonato</div>
-    <div class="card">
-      <div class="meta-list" id="metaList"></div>
-    </div>
-    <div class="sec-title">Atualizar via Wikipedia</div>
-    <div class="paste-panel">
-      <div class="paste-hint">
-        1. Abra o link Wikipedia no cabeçalho.<br>
-        2. Copie a linha do Bahia (ex: <code>3 Bahia 17 9 5 2 2 12 7 +5</code>).<br>
-        3. Cole abaixo e toque em Atualizar.
-      </div>
-      <textarea id="pasteIn" placeholder="Cole os dados aqui..."></textarea>
-      <div class="paste-actions">
-        <button class="btn-primary" onclick="doPaste()">ATUALIZAR</button>
-        <span class="paste-status" id="pStat"></span>
-      </div>
-    </div>
+    <div class="card"><div class="meta-list" id="metaList"></div></div>
+    <div class="sec-title">Tabela do Brasileirão</div>
+    <div class="card" id="tabelaCard"></div>
   </div>
-
-  <!-- JOGOS -->
-  <div class="tab-panel" id="tp-jogos">
-    <div id="gamesList"></div>
-  </div>
-
-  <!-- BLOCOS -->
+  <div class="tab-panel" id="tp-jogos"><div id="gamesList"></div></div>
   <div class="tab-panel" id="tp-blocos">
     <div class="sec-title">Desempenho por bloco</div>
     <div class="bloco-grid" id="blocoGrid"></div>
+    <div class="sec-title" style="margin-top:18px">Oscilação por bloco</div>
+    <div class="osc-grid" id="oscGrid"></div>
+    <div style="margin-top:14px" class="chart-card">
+      <div class="chart-legend">
+        <span class="leg-item"><span class="leg-line" style="background:#16A34A"></span>Pts reais</span>
+        <span class="leg-item"><span class="leg-line" style="background:#C8102E;opacity:.6"></span>Meta bloco</span>
+        <span class="leg-item"><span class="leg-line" style="background:#1449B0;opacity:.5"></span>Projeção</span>
+      </div>
+      <div style="position:relative;width:100%;height:180px"><canvas id="blockChart"></canvas></div>
+    </div>
   </div>
-
-  <!-- GRÁFICO -->
   <div class="tab-panel" id="tp-grafico">
     <div class="chart-card">
       <div class="chart-legend">
         <span class="leg-item"><span class="leg-line" style="background:#1449B0"></span>Bahia 2026</span>
         <span class="leg-item"><span class="leg-line" style="background:#1449B0;opacity:.35"></span>Projeção</span>
         <span class="leg-item"><span class="leg-line" style="background:#8A96A8"></span>Média 23–25</span>
-        <span class="leg-item"><span class="leg-line" style="background:#16A34A"></span>Meta G5</span>
-        <span class="leg-item"><span class="leg-line" style="background:#C8102E"></span>Título</span>
+        <span class="leg-item"><span class="leg-line" style="background:#C8102E"></span>Título (80)</span>
+        <span class="leg-item"><span class="leg-line" style="background:#16A34A"></span>Liberta (63)</span>
+        <span class="leg-item"><span class="leg-line" style="background:#D97706"></span>Sula (48)</span>
       </div>
-      <div style="position:relative;width:100%;height:260px">
-        <canvas id="mainChart"></canvas>
-      </div>
+      <div style="position:relative;width:100%;height:280px"><canvas id="mainChart"></canvas></div>
     </div>
+    <div class="last-update" id="tsGraf">—</div>
   </div>
-
 </div>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn on" onclick="setTab('painel',0)">
-    <div class="nav-icon">
-      <svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="2" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="11" y="2" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="2" y="11" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="11" y="11" width="7" height="7" rx="2" fill="#8A96A8"/></svg>
-    </div>
+    <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="2" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="11" y="2" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="2" y="11" width="7" height="7" rx="2" fill="#8A96A8"/><rect x="11" y="11" width="7" height="7" rx="2" fill="#8A96A8"/></svg></div>
     <span class="nav-label">Painel</span>
   </button>
   <button class="nav-btn" onclick="setTab('jogos',1)">
-    <div class="nav-icon">
-      <svg width="20" height="20" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="2" rx="1" fill="#8A96A8"/><rect x="3" y="9" width="14" height="2" rx="1" fill="#8A96A8"/><rect x="3" y="14" width="10" height="2" rx="1" fill="#8A96A8"/></svg>
-    </div>
+    <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="2" rx="1" fill="#8A96A8"/><rect x="3" y="9" width="14" height="2" rx="1" fill="#8A96A8"/><rect x="3" y="14" width="10" height="2" rx="1" fill="#8A96A8"/></svg></div>
     <span class="nav-label">Jogos</span>
   </button>
   <button class="nav-btn" onclick="setTab('blocos',2)">
-    <div class="nav-icon">
-      <svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="12" width="4" height="7" rx="1" fill="#8A96A8"/><rect x="8" y="7" width="4" height="12" rx="1" fill="#8A96A8"/><rect x="14" y="3" width="4" height="16" rx="1" fill="#8A96A8"/></svg>
-    </div>
+    <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="12" width="4" height="7" rx="1" fill="#8A96A8"/><rect x="8" y="7" width="4" height="12" rx="1" fill="#8A96A8"/><rect x="14" y="3" width="4" height="16" rx="1" fill="#8A96A8"/></svg></div>
     <span class="nav-label">Blocos</span>
   </button>
   <button class="nav-btn" onclick="setTab('grafico',3)">
-    <div class="nav-icon">
-      <svg width="20" height="20" viewBox="0 0 20 20"><polyline points="2,15 7,9 11,12 18,4" fill="none" stroke="#8A96A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
+    <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20"><polyline points="2,15 7,9 11,12 18,4" fill="none" stroke="#8A96A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <span class="nav-label">Gráfico</span>
   </button>
 </nav>
 
 <script>
-var GAMES = [
-  {r:1,opp:'Corinthians',loc:'F',date:'28-29/01',res:'V'},
-  {r:2,opp:'Fluminense',loc:'C',date:'04-05/02',res:'V'},
-  {r:3,opp:'Vasco',loc:'F',date:'11-12/02',res:'V'},
-  {r:4,opp:'Chapecoense',loc:'C',date:'25-26/02',res:'V'},
-  {r:5,opp:'Vitória',loc:'C',date:'11-12/03',res:'V'},
-  {r:6,opp:'Internacional',loc:'F',date:'14-16/03',res:'D'},
-  {r:7,opp:'Bragantino',loc:'C',date:'18-19/03',res:'V'},
-  {r:8,opp:'Remo',loc:'F',date:'21-23/03',res:'V'},
-  {r:9,opp:'Athletico-PR',loc:'C',date:'01-02/04',res:'E'},
-  {r:10,opp:'Palmeiras',loc:'C',date:'04-06/04',res:null},
-  {r:11,opp:'Mirassol',loc:'F',date:'11-13/04',res:null},
-  {r:12,opp:'Flamengo',loc:'F',date:'18-20/04',res:null},
-  {r:13,opp:'Santos',loc:'C',date:'24-26/04',res:null},
-  {r:14,opp:'São Paulo',loc:'F',date:'02-04/05',res:null},
-  {r:15,opp:'Cruzeiro',loc:'C',date:'09-11/05',res:null},
-  {r:16,opp:'Grêmio',loc:'C',date:'16-18/05',res:null},
-  {r:17,opp:'Coritiba',loc:'F',date:'23-25/05',res:null},
-  {r:18,opp:'Botafogo',loc:'C',date:'30/05-01/06',res:null},
-  {r:19,opp:'Atlético-MG',loc:'F',date:'22-23/07',res:null},
-  {r:20,opp:'Corinthians',loc:'C',date:'25-27/07',res:null},
-  {r:21,opp:'Fluminense',loc:'F',date:'29-30/07',res:null},
-  {r:22,opp:'Vasco',loc:'C',date:'08-10/08',res:null},
-  {r:23,opp:'Chapecoense',loc:'F',date:'15-17/08',res:null},
-  {r:24,opp:'Vitória',loc:'F',date:'22-24/08',res:null},
-  {r:25,opp:'Internacional',loc:'C',date:'29-31/08',res:null},
-  {r:26,opp:'Bragantino',loc:'F',date:'05-07/09',res:null},
-  {r:27,opp:'Remo',loc:'C',date:'12-14/09',res:null},
-  {r:28,opp:'Athletico-PR',loc:'F',date:'19-21/09',res:null},
-  {r:29,opp:'Palmeiras',loc:'F',date:'07-08/10',res:null},
-  {r:30,opp:'Mirassol',loc:'C',date:'10-12/10',res:null},
-  {r:31,opp:'Flamengo',loc:'C',date:'17-19/10',res:null},
-  {r:32,opp:'Santos',loc:'F',date:'24-26/10',res:null},
-  {r:33,opp:'São Paulo',loc:'C',date:'28-29/10',res:null},
-  {r:34,opp:'Cruzeiro',loc:'F',date:'04-05/11',res:null},
-  {r:35,opp:'Grêmio',loc:'F',date:'18-19/11',res:null},
-  {r:36,opp:'Coritiba',loc:'C',date:'21-23/11',res:null},
-  {r:37,opp:'Botafogo',loc:'F',date:'28-29/11',res:null},
-  {r:38,opp:'Atlético-MG',loc:'C',date:'02/12',res:null},
-];
+// ═══════════════════════════════════════════
+// MOCK — estrutura EXATA da API futapps.com
+// table.equipes.times[] e rodadas[].jogos[]
+// ═══════════════════════════════════════════
+var MOCK_TABELA = {"table":{"equipes":{"times":[
+  {"numberIndex":1,"name":"Palmeiras","shortName":"PAL","pts":22,"j":9,"v":7,"e":1,"d":1,"gp":19,"gc":9,"sg":10,"porcent":81,"last":["V","V","V","V","D"],"avatar":{"icon":"https://media.api-sports.io/football/teams/121.png"}},
+  {"numberIndex":2,"name":"Fluminense","shortName":"FLU","pts":19,"j":9,"v":6,"e":1,"d":2,"gp":16,"gc":10,"sg":6,"porcent":70,"last":["V","V","D","V","V"],"avatar":{"icon":"https://media.api-sports.io/football/teams/124.png"}},
+  {"numberIndex":3,"name":"Bahia","shortName":"BAH","pts":17,"j":8,"v":5,"e":2,"d":1,"gp":12,"gc":7,"sg":5,"porcent":71,"last":["V","D","V","V","E"],"avatar":{"icon":"https://media.api-sports.io/football/teams/118.png"}},
+  {"numberIndex":4,"name":"Sao Paulo","shortName":"PAU","pts":17,"j":9,"v":5,"e":2,"d":2,"gp":11,"gc":6,"sg":5,"porcent":63,"last":["E","D","D","V","V"],"avatar":{"icon":"https://media.api-sports.io/football/teams/126.png"}},
+  {"numberIndex":5,"name":"Atletico Paranaense","shortName":"CAP","pts":16,"j":9,"v":5,"e":1,"d":3,"gp":14,"gc":11,"sg":3,"porcent":59,"last":["D","V","V","V","D"],"avatar":{"icon":"https://media.api-sports.io/football/teams/134.png"}},
+  {"numberIndex":6,"name":"Flamengo","shortName":"FLA","pts":14,"j":8,"v":4,"e":2,"d":2,"gp":13,"gc":8,"sg":5,"porcent":58,"last":["D","E","V","V","V"],"avatar":{"icon":"https://media.api-sports.io/football/teams/127.png"}},
+  {"numberIndex":7,"name":"Coritiba","shortName":"COR","pts":14,"j":9,"v":4,"e":2,"d":3,"gp":10,"gc":9,"sg":1,"porcent":52,"last":["E","D","V","V","V"],"avatar":{"icon":"https://media.api-sports.io/football/teams/147.png"}},
+  {"numberIndex":8,"name":"Vasco DA Gama","shortName":"VAS","pts":12,"j":9,"v":3,"e":3,"d":3,"gp":14,"gc":14,"sg":0,"porcent":44,"last":["E","V","V","E","V"],"avatar":{"icon":"https://media.api-sports.io/football/teams/133.png"}},
+  {"numberIndex":9,"name":"Atletico-MG","shortName":"GAL","pts":11,"j":9,"v":3,"e":2,"d":4,"gp":12,"gc":11,"sg":1,"porcent":41,"last":["V","D","V","D","V"],"avatar":{"icon":"https://media.api-sports.io/football/teams/1062.png"}},
+  {"numberIndex":10,"name":"Gremio","shortName":"GRE","pts":11,"j":9,"v":3,"e":2,"d":4,"gp":14,"gc":14,"sg":0,"porcent":41,"last":["D","D","V","E","E"],"avatar":{"icon":"https://media.api-sports.io/football/teams/130.png"}},
+  {"numberIndex":11,"name":"RB Bragantino","shortName":"BRA","pts":11,"j":9,"v":3,"e":2,"d":4,"gp":9,"gc":10,"sg":-1,"porcent":41,"last":["V","D","D","D","E"],"avatar":{"icon":"https://media.api-sports.io/football/teams/794.png"}},
+  {"numberIndex":12,"name":"Vitoria","shortName":"VIT","pts":10,"j":8,"v":3,"e":1,"d":4,"gp":8,"gc":13,"sg":-5,"porcent":42,"last":["D","V","D","V","E"],"avatar":{"icon":"https://media.api-sports.io/football/teams/136.png"}},
+  {"numberIndex":13,"name":"Santos","shortName":"SAN","pts":10,"j":9,"v":2,"e":4,"d":3,"gp":12,"gc":13,"sg":-1,"porcent":37,"last":["V","E","D","E","E"],"avatar":{"icon":"https://media.api-sports.io/football/teams/128.png"}},
+  {"numberIndex":14,"name":"Corinthians","shortName":"COR","pts":10,"j":9,"v":2,"e":4,"d":3,"gp":8,"gc":10,"sg":-2,"porcent":37,"last":["D","E","E","E","D"],"avatar":{"icon":"https://media.api-sports.io/football/teams/131.png"}},
+  {"numberIndex":15,"name":"Botafogo","shortName":"BOT","pts":9,"j":8,"v":3,"e":0,"d":5,"gp":14,"gc":18,"sg":-4,"porcent":38,"last":["V","D","V","D","D"],"avatar":{"icon":"https://media.api-sports.io/football/teams/120.png"}},
+  {"numberIndex":16,"name":"Internacional","shortName":"INT","pts":9,"j":9,"v":2,"e":3,"d":4,"gp":8,"gc":10,"sg":-2,"porcent":33,"last":["E","V","V","D","D"],"avatar":{"icon":"https://media.api-sports.io/football/teams/119.png"}},
+  {"numberIndex":17,"name":"Cruzeiro","shortName":"CRU","pts":7,"j":9,"v":1,"e":4,"d":4,"gp":11,"gc":16,"sg":-5,"porcent":26,"last":["V","E","D","E","D"],"avatar":{"icon":"https://media.api-sports.io/football/teams/135.png"}},
+  {"numberIndex":18,"name":"Chapecoense-sc","shortName":"CHA","pts":7,"j":8,"v":1,"e":4,"d":3,"gp":9,"gc":15,"sg":-6,"porcent":29,"last":["D","D","E","E","D"],"avatar":{"icon":"https://media.api-sports.io/football/teams/132.png"}},
+  {"numberIndex":19,"name":"Mirassol","shortName":"MIR","pts":6,"j":8,"v":1,"e":3,"d":4,"gp":10,"gc":13,"sg":-3,"porcent":25,"last":["D","D","D","D","E"],"avatar":{"icon":"https://media.api-sports.io/football/teams/7848.png"}},
+  {"numberIndex":20,"name":"remo","shortName":"REM","pts":6,"j":9,"v":1,"e":3,"d":5,"gp":10,"gc":17,"sg":-7,"porcent":22,"last":["D","V","D","D","D"],"avatar":{"icon":"https://media.api-sports.io/football/teams/1198.png"}}
+]}}};
 
-var BLOCOS = [
-  {label:'Bloco 1',rds:[1,2,3,4,5],meta:10},
-  {label:'Bloco 2',rds:[6,7,8,9,10],meta:8},
-  {label:'Bloco 3',rds:[11,12,13,14,15,16],meta:9},
+var MOCK_RODADAS = {"rodadas":[
+  {"rodada":1,"jogos":[{"mandante":"Corinthians","visitante":"Bahia","golsMandante":0,"golsVisitante":1,"status":"encerrado","data":"28/01"}]},
+  {"rodada":2,"jogos":[{"mandante":"Bahia","visitante":"Fluminense","golsMandante":2,"golsVisitante":1,"status":"encerrado","data":"04/02"}]},
+  {"rodada":3,"jogos":[{"mandante":"Vasco DA Gama","visitante":"Bahia","golsMandante":0,"golsVisitante":2,"status":"encerrado","data":"11/02"}]},
+  {"rodada":4,"jogos":[{"mandante":"Bahia","visitante":"Chapecoense-sc","golsMandante":3,"golsVisitante":1,"status":"encerrado","data":"25/02"}]},
+  {"rodada":5,"jogos":[{"mandante":"Bahia","visitante":"Vitoria","golsMandante":2,"golsVisitante":0,"status":"encerrado","data":"11/03"}]},
+  {"rodada":6,"jogos":[{"mandante":"Internacional","visitante":"Bahia","golsMandante":2,"golsVisitante":0,"status":"encerrado","data":"14/03"}]},
+  {"rodada":7,"jogos":[{"mandante":"Bahia","visitante":"RB Bragantino","golsMandante":1,"golsVisitante":0,"status":"encerrado","data":"18/03"}]},
+  {"rodada":8,"jogos":[{"mandante":"remo","visitante":"Bahia","golsMandante":1,"golsVisitante":3,"status":"encerrado","data":"21/03"}]},
+  {"rodada":9,"jogos":[{"mandante":"Bahia","visitante":"Atletico Paranaense","golsMandante":1,"golsVisitante":1,"status":"encerrado","data":"01/04"}]},
+  {"rodada":10,"jogos":[{"mandante":"Bahia","visitante":"Palmeiras","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"04/04"}]},
+  {"rodada":11,"jogos":[{"mandante":"Mirassol","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"11/04"}]},
+  {"rodada":12,"jogos":[{"mandante":"Flamengo","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"18/04"}]},
+  {"rodada":13,"jogos":[{"mandante":"Bahia","visitante":"Santos","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"24/04"}]},
+  {"rodada":14,"jogos":[{"mandante":"Sao Paulo","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"02/05"}]},
+  {"rodada":15,"jogos":[{"mandante":"Bahia","visitante":"Cruzeiro","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"09/05"}]},
+  {"rodada":16,"jogos":[{"mandante":"Bahia","visitante":"Gremio","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"16/05"}]},
+  {"rodada":17,"jogos":[{"mandante":"Coritiba","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"23/05"}]},
+  {"rodada":18,"jogos":[{"mandante":"Bahia","visitante":"Botafogo","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"30/05"}]},
+  {"rodada":19,"jogos":[{"mandante":"Atletico-MG","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"22/07"}]},
+  {"rodada":20,"jogos":[{"mandante":"Bahia","visitante":"Corinthians","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"25/07"}]},
+  {"rodada":21,"jogos":[{"mandante":"Fluminense","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"29/07"}]},
+  {"rodada":22,"jogos":[{"mandante":"Bahia","visitante":"Vasco DA Gama","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"08/08"}]},
+  {"rodada":23,"jogos":[{"mandante":"Chapecoense-sc","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"15/08"}]},
+  {"rodada":24,"jogos":[{"mandante":"Vitoria","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"22/08"}]},
+  {"rodada":25,"jogos":[{"mandante":"Bahia","visitante":"Internacional","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"29/08"}]},
+  {"rodada":26,"jogos":[{"mandante":"RB Bragantino","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"05/09"}]},
+  {"rodada":27,"jogos":[{"mandante":"Bahia","visitante":"remo","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"12/09"}]},
+  {"rodada":28,"jogos":[{"mandante":"Atletico Paranaense","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"19/09"}]},
+  {"rodada":29,"jogos":[{"mandante":"Palmeiras","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"07/10"}]},
+  {"rodada":30,"jogos":[{"mandante":"Bahia","visitante":"Mirassol","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"10/10"}]},
+  {"rodada":31,"jogos":[{"mandante":"Bahia","visitante":"Flamengo","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"17/10"}]},
+  {"rodada":32,"jogos":[{"mandante":"Santos","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"24/10"}]},
+  {"rodada":33,"jogos":[{"mandante":"Bahia","visitante":"Sao Paulo","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"28/10"}]},
+  {"rodada":34,"jogos":[{"mandante":"Cruzeiro","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"04/11"}]},
+  {"rodada":35,"jogos":[{"mandante":"Gremio","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"18/11"}]},
+  {"rodada":36,"jogos":[{"mandante":"Bahia","visitante":"Coritiba","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"21/11"}]},
+  {"rodada":37,"jogos":[{"mandante":"Botafogo","visitante":"Bahia","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"28/11"}]},
+  {"rodada":38,"jogos":[{"mandante":"Bahia","visitante":"Atletico-MG","golsMandante":null,"golsVisitante":null,"status":"agendado","data":"02/12"}]}
+]};
+
+// ═══════════════════════════════════════════
+// CONFIGS
+// ═══════════════════════════════════════════
+var METAS_CFG=[
+  {l:'Título',          meta:80,color:'#C8102E',dot:'#E8102E'},
+  {l:'G5 — Libertadores',meta:63,color:'#0A2D6E',dot:'#1449B0'},
+  {l:'Qualy Liberta',   meta:58,color:'#1E5FD4',dot:'#378ADD'},
+  {l:'Sudamericana',    meta:48,color:'#8A96A8',dot:'#8A96A8'},
+];
+var METAS_SIM=[
+  {l:'Título', total:80,color:'#C8102E'},
+  {l:'Liberta',total:63,color:'#1449B0'},
+  {l:'Sula',   total:48,color:'#D97706'},
+];
+var BLOCOS=[
+  {label:'Bloco 1',rds:[1,2,3,4,5],        meta:10},
+  {label:'Bloco 2',rds:[6,7,8,9,10],        meta:8},
+  {label:'Bloco 3',rds:[11,12,13,14,15,16], meta:9},
   {label:'Bloco 4',rds:[17,18,19,20,21,22,23],meta:10},
   {label:'Bloco 5',rds:[24,25,26,27,28,29,30],meta:10},
-  {label:'Final',rds:[31,32,33,34,35,36,37,38],meta:12},
+  {label:'Final',  rds:[31,32,33,34,35,36,37,38],meta:12},
 ];
+var HIST=(function(){var a=[],ap=(44+53+60)/(3*38*3);for(var r=1;r<=38;r++)a.push(+(ap*r*3).toFixed(1));return a;})();
 
-var HIST = (function(){
-  var a=[];var ap=(44+53+60)/(3*38*3);
-  for(var r=1;r<=38;r++) a.push(+(ap*r*3).toFixed(1));
-  return a;
-})();
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+var tabelaTimes=[], GAMES=[], bahia={};
+var chartInst=null, blockChartInst=null, activeTab='painel';
 
-var chartInst = null;
-var activeTab = 'painel';
-
-function pts(res){ return res==='V'?3:res==='E'?1:res==='D'?0:null; }
-
-function calcState(){
-  var p=0,v=0,e=0,d=0,gj=0;
-  GAMES.forEach(function(g){
-    var x=pts(g.res);
-    if(x!==null){p+=x;if(g.res==='V')v++;else if(g.res==='E')e++;else d++;gj++;}
+// ═══════════════════════════════════════════
+// PARSE — lê estrutura exata da API
+// ═══════════════════════════════════════════
+function parseTabela(r){
+  var times=r.table.equipes.times;
+  tabelaTimes=times.map(function(t){
+    return{pos:t.numberIndex,nome:t.name,short:t.shortName,pts:t.pts,pj:t.j,
+      v:t.v,e:t.e,d:t.d,gp:t.gp,gc:t.gc,sg:t.sg,aprov:t.porcent,
+      last:t.last||[],icon:t.avatar&&t.avatar.icon?t.avatar.icon:''};
   });
-  var aprov=gj>0?p/gj/3*100:0;
-  var proj=gj>0?Math.round(p/gj*38):null;
-  return{p,v,e,d,gj,aprov,proj};
+  bahia=tabelaTimes.find(function(t){return t.nome.toLowerCase().includes('bahia');})||{};
 }
 
-function firstUnplayed(){
-  for(var i=0;i<GAMES.length;i++) if(GAMES[i].res===null) return i;
-  return -1;
+function parseRodadas(r){
+  GAMES=[];
+  r.rodadas.forEach(function(rod){
+    var num=parseInt(rod.rodada);
+    (rod.jogos||[]).forEach(function(j){
+      var hNm=j.mandante||'', aNm=j.visitante||'';
+      var isH=hNm.toLowerCase().includes('bahia'), isA=aNm.toLowerCase().includes('bahia');
+      if(!isH&&!isA) return;
+      var loc=isH?'C':'F', opp=isH?aNm:hNm;
+      var enc=j.status&&j.status!=='agendado'&&j.status!=='scheduled';
+      var res=null,gp=null,gc=null;
+      if(enc&&j.golsMandante!==null&&j.golsMandante!==undefined){
+        var bg=isH?j.golsMandante:j.golsVisitante;
+        var og=isH?j.golsVisitante:j.golsMandante;
+        gp=bg; gc=og;
+        res=bg>og?'V':bg===og?'E':'D';
+      }
+      GAMES.push({r:num,opp:opp,loc:loc,date:j.data||'',res:res,gp:gp,gc:gc});
+    });
+  });
+  GAMES.sort(function(a,b){return a.r-b.r;});
 }
 
-function setTab(id, idx){
-  activeTab = id;
-  document.querySelectorAll('.tab-panel').forEach(function(el){ el.classList.remove('on'); });
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function pts(res){return res==='V'?3:res==='E'?1:res==='D'?0:null;}
+function firstUnplayed(){for(var i=0;i<GAMES.length;i++)if(GAMES[i].res===null)return i;return -1;}
+function setRes(i,v){GAMES[i].res=v===''?null:v;renderAll();}
+function setTab(id,idx){
+  activeTab=id;
+  document.querySelectorAll('.tab-panel').forEach(function(e){e.classList.remove('on');});
   document.getElementById('tp-'+id).classList.add('on');
-  document.querySelectorAll('.nav-btn').forEach(function(b,i){ b.classList.toggle('on', i===idx); });
-  if(id==='grafico') renderChart();
+  document.querySelectorAll('.nav-btn').forEach(function(b,i){b.classList.toggle('on',i===idx);});
+  if(id==='grafico')renderChart();
+  if(id==='blocos')renderBlockChart();
+}
+function refreshData(){
+  var btn=document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  // Trocar por fetch real quando CORS disponível:
+  // fetch('https://api-sport.futapps.com/web/api/v1/tabelas/71?year=2026&noRodadas=true&type=ajax')
+  //   .then(r=>r.json()).then(function(d){parseTabela(d);...})
+  setTimeout(function(){
+    parseTabela(MOCK_TABELA);
+    parseRodadas(MOCK_RODADAS);
+    renderAll();
+    btn.classList.remove('spinning');
+    var now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('tsHeader').textContent=now;
+    var g=document.getElementById('tsGraf');
+    if(g) g.textContent='Atualizado às '+now;
+  },500);
 }
 
-function setRes(i, val){
-  GAMES[i].res = val===''?null:val;
-  renderAll();
-}
-
+// ═══════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════
 function renderAll(){
-  var s=calcState();
-  // header strip
-  document.getElementById('sh-pos').textContent = '3°'; // posição não inferida da simulação
-  document.getElementById('sh-pts').textContent = s.p;
-  document.getElementById('sh-aprov').textContent = s.aprov.toFixed(1)+'%';
-  document.getElementById('sh-proj').textContent = s.proj||'—';
-  renderProjHero(s);
-  renderMetas(s);
+  // usa stats da tabela (API) que são os mais confiáveis
+  var pts_=bahia.pts||0, pj_=bahia.pj||0, ap_=bahia.aprov||0;
+  var pos_=bahia.pos||'—', proj_=pj_>0?Math.round(pts_/pj_*38):null;
+  var rest_=38-pj_;
+
+  document.getElementById('sh-pos').textContent=pos_+(pos_!=='—'?'°':'');
+  document.getElementById('sh-pts').textContent=pts_;
+  var apEl=document.getElementById('sh-aprov');
+  apEl.textContent=ap_+'%';
+  apEl.className='stat-val '+(ap_>=60?'green':ap_>=45?'amber':'red');
+  document.getElementById('sh-proj').textContent=proj_||'—';
+
+  renderProjHero(pts_,ap_,proj_,pj_,rest_);
+  renderStatCard(pts_,pj_,rest_);
+  renderMetas(pts_,pj_,rest_);
+  renderTabela();
   renderGames();
   renderBlocos();
   if(activeTab==='grafico') renderChart();
+  if(activeTab==='blocos') renderBlockChart();
 }
 
-function renderProjHero(s){
-  var el=document.getElementById('projHero');
-  var proj=s.proj||0;
-  var color=proj>=63?'#6BDFA3':proj>=48?'#FAD166':'#FF8080';
-  el.innerHTML='<div class="proj-hero">'
-    +'<div class="proj-left">'
+function renderProjHero(pts_,ap_,proj_,pj_,rest_){
+  var apColor=ap_>=60?'#5EE8A0':ap_>=45?'#FBBF24':'#FF7070';
+  var badges='';
+  METAS_CFG.forEach(function(m){
+    var faltam=Math.max(0,m.meta-pts_), ok=pts_>=m.meta, poss=faltam<=rest_*3;
+    badges+='<span class="proj-badge '+(ok?'pb-ating':poss?'pb-risco':'pb-fora')+'">'+m.l+(ok?' ✓':'')+'</span>';
+  });
+  document.getElementById('projHero').innerHTML=
+    '<div class="proj-hero"><div class="proj-left">'
     +'<div class="proj-label">Projeção final</div>'
-    +'<div class="proj-num">'+( s.proj||'—' )+'</div>'
+    +'<div class="proj-num">'+(proj_||'—')+'</div>'
     +'<div class="proj-sub">pontos em 38 jogos</div>'
-    +'</div>'
-    +'<div class="proj-right">'
-    +'<div class="proj-aprov-val" style="color:'+color+'">'+s.aprov.toFixed(1)+'%</div>'
+    +'<div class="proj-meta-badges">'+badges+'</div>'
+    +'</div><div class="proj-right">'
+    +'<div class="proj-aprov-val" style="color:'+apColor+'">'+ap_+'%</div>'
     +'<div class="proj-aprov-lbl">aproveitamento</div>'
-    +'<div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.55)">'+s.gj+' jogos · '+(38-s.gj)+' restantes</div>'
+    +'<div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.5)">'+pj_+' jogos · '+rest_+' restantes</div>'
+    +'</div></div>';
+}
+
+function renderStatCard(pts_,pj_,rest_){
+  var v=bahia.v||0,e=bahia.e||0,d=bahia.d||0,gp=bahia.gp||0,gc=bahia.gc||0;
+  var sg=gp-gc, ap=pj_>0?(pts_/pj_/3*100):0;
+  var apColor=ap>=60?'#16A34A':ap>=45?'#D97706':'#DC2626';
+  var l5html=(bahia.last||[]).map(function(r){
+    return '<span class="l5-chip '+(r==='V'?'l5-v':r==='E'?'l5-e':'l5-d')+'">'+r+'</span>';
+  }).join('');
+  document.getElementById('statCard').innerHTML=
+    '<div class="stat-card"><div class="stat-card-title">📊 Resumo da temporada</div>'
+    +'<div class="stat-grid">'
+    +'<div class="stat-box"><div class="stat-box-val">'+pts_+'</div><div class="stat-box-lbl">Pontos</div></div>'
+    +'<div class="stat-box"><div class="stat-box-val green">'+v+'</div><div class="stat-box-lbl">Vitórias</div></div>'
+    +'<div class="stat-box"><div class="stat-box-val amber">'+e+'</div><div class="stat-box-lbl">Empates</div></div>'
+    +'<div class="stat-box"><div class="stat-box-val red">'+d+'</div><div class="stat-box-lbl">Derrotas</div></div>'
     +'</div>'
+    +'<div class="goals-row">'
+    +'<div class="goal-chip"><div class="goal-chip-val green">'+gp+'</div><div class="goal-chip-lbl">Gols Pró</div></div>'
+    +'<div class="goal-chip"><div class="goal-chip-val red">'+gc+'</div><div class="goal-chip-lbl">Gols Contra</div></div>'
+    +'<div class="goal-chip"><div class="goal-chip-val '+(sg>=0?'green':'red')+'">'+(sg>0?'+':'')+sg+'</div><div class="goal-chip-lbl">Saldo</div></div>'
+    +'</div>'
+    +'<div class="aprov-bar-wrap"><div class="aprov-bar" style="width:'+Math.min(100,ap).toFixed(1)+'%;background:'+apColor+'"></div></div>'
+    +'<div class="aprov-label"><span>Aproveitamento</span><span style="color:'+apColor+'">'+ap.toFixed(1)+'%</span></div>'
+    +(l5html?'<div class="last5-row"><span class="last5-lbl">Últ. 5</span>'+l5html+'</div>':'')
     +'</div>';
 }
 
-function renderMetas(s){
-  var rest=38-s.gj;
-  var metas=[
-    {l:'Título',meta:80,color:'#C8102E',dot:'#E8102E'},
-    {l:'G5 — Libertadores',meta:63,color:'#0A2D6E',dot:'#1449B0'},
-    {l:'Qualy Libertadores',meta:58,color:'#1E5FD4',dot:'#378ADD'},
-    {l:'Sudamericana',meta:48,color:'#8A96A8',dot:'#8A96A8'},
-  ];
+function renderMetas(pts_,pj_,rest_){
   var html='';
-  metas.forEach(function(m){
-    var faltam=Math.max(0,m.meta-s.p);
-    var apMin=rest>0?Math.round(faltam/rest/3*1000)/10:0;
-    var pct=Math.min(100,Math.round(s.p/m.meta*100));
-    var ok=s.p>=m.meta;
-    html+='<div class="meta-row">'
-      +'<span class="meta-dot" style="background:'+m.dot+'"></span>'
-      +'<div class="meta-info">'
-        +'<div class="meta-name">'+m.l+'</div>'
-        +'<div class="meta-sub">'+(ok?'Meta atingida':'min. '+apMin+'% de aproveit.')+'</div>'
-        +'<div class="meta-bar-wrap"><div class="meta-bar" style="width:'+pct+'%;background:'+m.color+'"></div></div>'
-      +'</div>'
-      +'<div style="text-align:right">'
-        +'<div class="meta-pts" style="color:'+m.color+'">'+(ok?'✓':faltam)+'</div>'
-        +'<span class="meta-tag '+(ok?'tag-ok':'tag-pend')+'">'+(ok?'OK':faltam+' pts')+'</span>'
-      +'</div>'
-      +'</div>';
+  METAS_CFG.forEach(function(m){
+    var faltam=Math.max(0,m.meta-pts_);
+    var apMin=rest_>0?Math.round(faltam/rest_/3*1000)/10:0;
+    var pct=Math.min(100,Math.round(pts_/m.meta*100)), ok=pts_>=m.meta;
+    html+='<div class="meta-row"><span class="meta-dot" style="background:'+m.dot+'"></span>'
+      +'<div class="meta-info"><div class="meta-name">'+m.l+'</div>'
+      +'<div class="meta-sub">'+(ok?'✅ Meta atingida!':'Faltam '+faltam+' pts — mín. '+apMin+'% nos '+rest_+' jogos')+'</div>'
+      +'<div class="meta-bar-wrap"><div class="meta-bar" style="width:'+pct+'%;background:'+m.color+'"></div></div>'
+      +'</div><div style="text-align:right">'
+      +'<div class="meta-pts" style="color:'+m.color+'">'+(ok?'✓':faltam)+'</div>'
+      +'<span class="meta-tag '+(ok?'tag-ok':'tag-pend')+'">'+(ok?'OK':faltam+' pts')+'</span>'
+      +'</div></div>';
   });
   document.getElementById('metaList').innerHTML=html;
 }
 
+function renderTabela(){
+  if(!tabelaTimes.length){document.getElementById('tabelaCard').innerHTML='<div style="padding:20px;text-align:center;color:#8A96A8;font-size:12px">Tabela indisponível</div>';return;}
+  function zColor(p){return p<=6?'#1449B0':p<=12?'#D97706':p>=18?'#DC2626':'transparent';}
+  var prevZ='', html='<div class="tabela-wrap"><table class="tabela"><thead><tr>'
+    +'<th>#</th><th class="th-time">Time</th><th>PJ</th><th>PTS</th>'
+    +'<th>V</th><th>E</th><th>D</th><th>SG</th><th>%</th><th>Últ5</th>'
+    +'</tr></thead><tbody>';
+  tabelaTimes.forEach(function(t){
+    var isBahia=t.nome.toLowerCase().includes('bahia');
+    var z=t.pos<=6?'L':t.pos<=12?'S':t.pos>=18?'R':'N';
+    var sep=(z!==prevZ&&prevZ!==''&&(z==='S'||z==='R'))?' zona-sep':'';
+    prevZ=z;
+    var l5=(t.last||[]).map(function(r){return '<span class="l5m '+(r==='V'?'v':r==='E'?'e':'d')+'">'+r+'</span>';}).join('');
+    html+='<tr class="'+(isBahia?'bahia-row':'')+sep+'">'
+      +'<td class="pos-cell"><span class="zona-pip" style="background:'+zColor(t.pos)+'"></span>'+t.pos+'</td>'
+      +'<td class="team-cell"><div class="team-inner"><img class="team-avatar" src="'+t.icon+'" onerror="this.style.display=\'none\'" loading="lazy"><span class="team-nm'+(isBahia?' bahia':'')+'">'+t.nome+(isBahia?' 🔵🔴':'')+'</span></div></td>'
+      +'<td>'+t.pj+'</td>'
+      +'<td class="pts-cell">'+t.pts+'</td>'
+      +'<td style="color:#16A34A;font-weight:700">'+t.v+'</td>'
+      +'<td style="color:#2563EB;font-weight:700">'+t.e+'</td>'
+      +'<td style="color:#DC2626;font-weight:700">'+t.d+'</td>'
+      +'<td style="font-weight:700;color:'+(t.sg>0?'#16A34A':t.sg<0?'#DC2626':'#8A96A8')+'">'+(t.sg>0?'+':'')+t.sg+'</td>'
+      +'<td style="font-size:10px">'+t.aprov+'%</td>'
+      +'<td><div class="l5-mini">'+l5+'</div></td>'
+      +'</tr>';
+  });
+  html+='</tbody></table>'
+    +'<div class="tabela-leg">'
+    +'<div class="leg-zona"><span class="leg-dot" style="background:#1449B0"></span>Libertadores</div>'
+    +'<div class="leg-zona"><span class="leg-dot" style="background:#D97706"></span>Sudamericana</div>'
+    +'<div class="leg-zona"><span class="leg-dot" style="background:#DC2626"></span>Rebaixamento</div>'
+    +'</div></div>';
+  document.getElementById('tabelaCard').innerHTML=html;
+}
+
 function renderGames(){
-  var el=document.getElementById('gamesList');
-  var html='';
-  var prevTurn=0;
-  var nextIdx=firstUnplayed();
+  var el=document.getElementById('gamesList'), html='',prevT=0,nextIdx=firstUnplayed();
   GAMES.forEach(function(g,i){
     var turn=g.r<=19?1:2;
-    if(turn!==prevTurn){
-      html+='<div class="turn-label">'+(turn===1?'Primeiro Turno':'Returno')+'</div>';
-      prevTurn=turn;
-    }
+    if(turn!==prevT){html+='<div class="turn-label">'+(turn===1?'1° Turno':'2° Turno / Returno')+'</div>';prevT=turn;}
     var p=pts(g.res);
-    var cardCls='game-card'+(g.res==='V'?' played-w':g.res==='E'?' played-e':g.res==='D'?' played-l':i===nextIdx?' next-game':'');
-    var ptsCls=g.res==='V'?'gpts-w':g.res==='E'?'gpts-e':g.res==='D'?'gpts-l':'gpts-p';
-    var ptsStr=p!==null?p:'·';
-    html+='<div class="'+cardCls+'">'
+    var cls='game-card'+(g.res==='V'?' played-w':g.res==='E'?' played-e':g.res==='D'?' played-l':i===nextIdx?' next-game':'');
+    var pc=g.res==='V'?'gpts-w':g.res==='E'?'gpts-e':g.res==='D'?'gpts-l':'gpts-p';
+    var score=g.gp!==null&&g.gp!==undefined?'<span class="score-tag">'+g.gp+':'+g.gc+'</span>':'';
+    html+='<div class="'+cls+'">'
       +'<div class="game-rnd">'+g.r+'</div>'
       +'<div class="game-info">'
-        +'<div class="game-opp">'+g.opp+'</div>'
-        +'<div class="game-meta"><span class="loc-badge '+(g.loc==='C'?'loc-c':'loc-f')+'">'+g.loc+'</span>'+g.date+'</div>'
+      +'<div class="game-opp">'+g.opp+'</div>'
+      +'<div class="game-meta"><span class="loc-badge '+(g.loc==='C'?'loc-c':'loc-f')+'">'+(g.loc==='C'?'CASA':'FORA')+'</span>'+g.date+score+'</div>'
       +'</div>'
-      +'<div class="game-pts-col '+ptsCls+'">'+ptsStr+'</div>'
-      +'<div class="game-sel-col">'
-        +'<select class="res-sel" onchange="setRes('+i+',this.value)">'
-          +'<option value="" '+(g.res===null?'selected':'')+'>—</option>'
-          +'<option value="V" '+(g.res==='V'?'selected':'')+'>Vitória</option>'
-          +'<option value="E" '+(g.res==='E'?'selected':'')+'>Empate</option>'
-          +'<option value="D" '+(g.res==='D'?'selected':'')+'>Derrota</option>'
-        +'</select>'
-      +'</div>'
-      +'</div>';
+      +'<div class="game-pts-col '+pc+'">'+(p!==null?p:'·')+'</div>'
+      +'<div class="game-sel-col"><select class="res-sel" onchange="setRes('+i+',this.value)">'
+      +'<option value="" '+(g.res===null?'selected':'')+'>—</option>'
+      +'<option value="V" '+(g.res==='V'?'selected':'')+'>✅ V</option>'
+      +'<option value="E" '+(g.res==='E'?'selected':'')+'>🟡 E</option>'
+      +'<option value="D" '+(g.res==='D'?'selected':'')+'>❌ D</option>'
+      +'</select></div></div>';
   });
   el.innerHTML=html;
 }
 
 function renderBlocos(){
-  var html='';
-  var cumPts=0;
+  var cumPts=0, bHtml='', oscHtml='';
   BLOCOS.forEach(function(b){
-    var bPts=0,bPlayed=0;
-    b.rds.forEach(function(r){ var g=GAMES[r-1];var p=pts(g.res);if(p!==null){bPts+=p;bPlayed++;} });
-    var all=bPlayed===b.rds.length;
-    var any=bPlayed>0;
+    var bPts=0,bPlayed=0,bGP=0,bGC=0;
+    b.rds.forEach(function(r){var g=GAMES[r-1];if(!g)return;var p=pts(g.res);if(p!==null){bPts+=p;bPlayed++;bGP+=g.gp||0;bGC+=g.gc||0;}});
+    var all=bPlayed===b.rds.length, any=bPlayed>0;
     if(any) cumPts+=bPts;
+    var saldo=bPts-b.meta, saldoG=bGP-bGC;
     var cls=all?(bPts>=b.meta?'ok':'fail'):(any?'partial':'');
-    var badgeCls=all?(bPts>=b.meta?'bb-ok':'bb-fail'):(any?'bb-partial':'bb-pend');
-    var badgeTxt=all?(bPts>=b.meta?'Meta ok':'Abaixo'):(any?bPlayed+'/'+b.rds.length+' jogos':'Pendente');
-    var realColor=all?(bPts>=b.meta?'green':'red'):(any?'amber':'muted');
-    html+='<div class="bloco-card '+cls+'">'
-      +'<div class="bloco-head"><span class="bloco-name">'+b.label+'</span><span class="bloco-badge '+badgeCls+'">'+badgeTxt+'</span></div>'
-      +'<div class="bloco-pts-row"><span class="bloco-real '+realColor+'">'+(any?bPts:'—')+'</span><span class="bloco-sep"> / </span><span class="bloco-meta">'+b.meta+'</span></div>'
+    var bCl=all?(bPts>=b.meta?'bb-ok':'bb-fail'):(any?'bb-partial':'bb-pend');
+    var bTx=all?(bPts>=b.meta?'Meta ✓':'Abaixo'):(any?bPlayed+'/'+b.rds.length+' jgos':'Pendente');
+    var rcl=all?(bPts>=b.meta?'green':'red'):(any?'amber':'muted');
+
+    // simulação de metas históricas
+    var simLines='';
+    METAS_SIM.forEach(function(m){
+      var bMeta=Math.round(m.total*b.rds.length/38);
+      var diff=any?(bPts-bMeta):null;
+      var txt=diff===null?'—':(diff>=0?'+'+diff:String(diff));
+      var col=diff===null?'#8A96A8':(diff>=0?m.color:'#DC2626');
+      simLines+='<div class="sim-line"><span class="sim-dot" style="background:'+m.color+'"></span><span class="sim-txt">'+m.l+' (meta '+bMeta+')</span><span class="sim-val" style="color:'+col+'">'+txt+'</span></div>';
+    });
+
+    bHtml+='<div class="bloco-card '+cls+'">'
+      +'<div class="bloco-head"><span class="bloco-name">'+b.label+'</span><span class="bloco-badge '+bCl+'">'+bTx+'</span></div>'
+      +'<div class="bloco-pts-row"><span class="bloco-real '+rcl+'">'+(any?bPts:'—')+'</span><span class="bloco-sep"> / </span><span class="bloco-meta-v">'+b.meta+'</span></div>'
       +'<div class="bloco-sub">R'+b.rds[0]+'–R'+b.rds[b.rds.length-1]+' · '+b.rds.length+' jogos</div>'
-      +(any?'<div class="bloco-accum">Acumulado: '+cumPts+' pts</div>':'')
+      +(any
+        ?'<div class="bloco-extras">'
+        +'<div class="saldo-chips">'
+        +'<span class="saldo-chip '+(saldo>0?'sp':saldo<0?'sn':'sz')+'">'+(saldo>0?'+':'')+saldo+' pts</span>'
+        +'<span class="saldo-chip '+(saldoG>=0?'sp':'sn')+'">SG '+(saldoG>0?'+':'')+saldoG+'</span>'
+        +'</div>'
+        +'<div class="bloco-acum">Acumulado: <strong>'+cumPts+' pts</strong></div>'
+        +'<div class="sim-wrap"><div class="sim-title">Simulação histórica</div>'+simLines+'</div>'
+        +'</div>'
+        :'')
       +'</div>';
+
+    // oscilação
+    var maxP=b.rds.length*3;
+    var pp=any?(bPts/maxP*100):0, np=any?((maxP-bPts)/maxP*100):0;
+    var ov=any?(bPts-b.meta):null;
+    oscHtml+='<div class="osc-row"><div class="osc-label">'+b.label+'</div>'
+      +'<div class="osc-bar-track"><div class="osc-pos-bar" style="width:'+pp+'%"></div><div class="osc-neg-bar" style="width:'+np+'%"></div></div>'
+      +'<div class="osc-val '+(ov===null?'zero':ov>=0?'pos':'neg')+'">'+(ov===null?'—':(ov>=0?'+':'')+ov)+'</div></div>';
   });
-  document.getElementById('blocoGrid').innerHTML=html;
+  document.getElementById('blocoGrid').innerHTML=bHtml;
+  document.getElementById('oscGrid').innerHTML=oscHtml;
 }
 
 function buildCumulative(){
-  var real=[],proj=[];
-  var running=0,played=0;
+  var real=[],proj=[],run=0,played=0;
   GAMES.forEach(function(g,i){
     var p=pts(g.res);
-    if(p!==null){running+=p;played++;}
-    if(p!==null){real.push(running);proj.push(null);}
-    else if(played>0){real.push(null);proj.push(Math.round(running/played*(i+1)));}
+    if(p!==null){run+=p;played++;}
+    if(p!==null){real.push(run);proj.push(null);}
+    else if(played>0){real.push(null);proj.push(Math.round(run/played*(i+1)));}
     else{real.push(null);proj.push(null);}
   });
   return{real,proj};
 }
 
 function renderChart(){
-  var c=buildCumulative();
-  var labs=GAMES.map(function(g){return 'R'+g.r;});
-  var mL=Array(38).fill(63),mT=Array(38).fill(80);
+  var c=buildCumulative(), labs=GAMES.map(function(g){return 'R'+g.r;});
   if(chartInst) chartInst.destroy();
   chartInst=new Chart(document.getElementById('mainChart'),{
     type:'line',
     data:{labels:labs,datasets:[
-      {data:c.real,borderColor:'#1449B0',pointRadius:0,borderWidth:2.5,tension:0.4,spanGaps:false},
-      {data:c.proj,borderColor:'#1449B0',pointRadius:0,borderWidth:1.5,borderDash:[5,4],tension:0.4,spanGaps:false},
-      {data:HIST,borderColor:'#8A96A8',pointRadius:0,borderWidth:1.5,tension:0.3},
-      {data:mL,borderColor:'#16A34A',pointRadius:0,borderWidth:1,borderDash:[4,4]},
-      {data:mT,borderColor:'#C8102E',pointRadius:0,borderWidth:1,borderDash:[4,4]},
+      {label:'Bahia 2026',data:c.real,borderColor:'#1449B0',backgroundColor:'rgba(20,73,176,.07)',fill:true,pointRadius:0,borderWidth:2.5,tension:0.4,spanGaps:false},
+      {label:'Projeção',data:c.proj,borderColor:'#1449B0',pointRadius:0,borderWidth:1.5,borderDash:[5,4],tension:0.4,spanGaps:false},
+      {label:'Média 23–25',data:HIST,borderColor:'#8A96A8',pointRadius:0,borderWidth:1.5,tension:0.3,borderDash:[3,3]},
+      {label:'Título',data:Array(38).fill(80),borderColor:'#C8102E',pointRadius:0,borderWidth:1,borderDash:[4,4]},
+      {label:'Liberta',data:Array(38).fill(63),borderColor:'#16A34A',pointRadius:0,borderWidth:1,borderDash:[4,4]},
+      {label:'Sula',data:Array(38).fill(48),borderColor:'#D97706',pointRadius:0,borderWidth:1,borderDash:[4,4]},
     ]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
+    options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{titleFont:{size:11},bodyFont:{size:11}}},
       scales:{
-        x:{ticks:{color:'#8A96A8',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(10,45,110,0.06)'}},
-        y:{min:0,max:85,ticks:{color:'#8A96A8',font:{size:9},stepSize:15},grid:{color:'rgba(10,45,110,0.06)'}}
+        x:{ticks:{color:'#8A96A8',font:{size:9},maxTicksLimit:10},grid:{color:'rgba(10,45,110,.05)'}},
+        y:{min:0,max:90,ticks:{color:'#8A96A8',font:{size:9},stepSize:10},grid:{color:'rgba(10,45,110,.06)'}}
       }
     }
   });
 }
 
-function doPaste(){
-  var raw=document.getElementById('pasteIn').value.trim();
-  if(!raw){document.getElementById('pStat').textContent='Cole os dados antes.';return;}
-  var nums=raw.match(/\d+/g);
-  if(!nums||nums.length<7){document.getElementById('pStat').textContent='Formato não reconhecido.';return;}
-  var idx=0;
-  if(nums.length>=8) idx++;
-  var gj=+nums[idx+1],v=+nums[idx+2],e=+nums[idx+3],d=+nums[idx+4];
-  var seq=[];
-  for(var i=0;i<v;i++) seq.push('V');
-  for(var i=0;i<e;i++) seq.push('E');
-  for(var i=0;i<d;i++) seq.push('D');
-  var played=0;
-  GAMES.forEach(function(g,i){
-    if(i<gj&&seq[played]!==undefined){g.res=seq[played];played++;}
-    else if(i>=gj) g.res=null;
+function renderBlockChart(){
+  var labels=[],real=[],metas=[],proj=[];
+  BLOCOS.forEach(function(b){
+    var bPts=0,bPlayed=0;
+    b.rds.forEach(function(r){var g=GAMES[r-1];if(g&&pts(g.res)!==null){bPts+=pts(g.res);bPlayed++;}});
+    var pv=bPlayed>0&&bPlayed<b.rds.length?Math.round(bPts/bPlayed*b.rds.length):null;
+    labels.push(b.label); real.push(bPlayed>0?bPts:null); metas.push(b.meta); proj.push(pv);
   });
-  renderAll();
-  document.getElementById('pStat').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('pasteIn').value='';
+  if(blockChartInst) blockChartInst.destroy();
+  blockChartInst=new Chart(document.getElementById('blockChart'),{
+    type:'bar',
+    data:{labels:labels,datasets:[
+      {label:'Pts reais',data:real,backgroundColor:real.map(function(v,i){return v===null?'rgba(138,150,168,.2)':v>=metas[i]?'rgba(22,163,74,.75)':'rgba(220,38,38,.7)';}),borderRadius:6,borderSkipped:false},
+      {label:'Meta',data:metas,type:'line',borderColor:'rgba(200,16,46,.65)',borderWidth:2,borderDash:[4,4],pointRadius:4,pointBackgroundColor:'rgba(200,16,46,.7)',fill:false},
+      {label:'Projeção',data:proj,type:'line',borderColor:'rgba(20,73,176,.5)',borderWidth:1.5,borderDash:[5,4],pointRadius:3,fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#8A96A8',font:{size:10,weight:'700'}},grid:{display:false}},
+        y:{min:0,max:24,ticks:{color:'#8A96A8',font:{size:9},stepSize:4},grid:{color:'rgba(10,45,110,.06)'}}
+      }
+    }
+  });
 }
 
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+parseTabela(MOCK_TABELA);
+parseRodadas(MOCK_RODADAS);
+var now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+document.getElementById('tsHeader').textContent=now;
 renderAll();
 </script>
 </body>
